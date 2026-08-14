@@ -1,0 +1,453 @@
+/* =========================================================
+     TOKENS DE MARCA — modificar aquí para adaptar a otra empresa
+     ========================================================= */
+  :root {
+    --color-primary: #B3221E;       /* rojo extintor — acento y botón principal */
+    --color-primary-dark: #8C1A17;
+    --color-ink: #1C2024;           /* grafito casi negro — texto y header */
+    --color-ink-soft: #4A5157;
+    --color-bg: #F3F2F0;            /* gris cálido de fondo */
+    --color-surface: #FFFFFF;
+    --color-border: #E1DED9;
+
+    --color-vigente: #1E7A4C;
+    --color-vigente-bg: #E7F4EC;
+    --color-proximo: #B9791A;
+    --color-proximo-bg: #FBF1DE;
+    --color-vencido: #B3221E;
+    --color-vencido-bg: #FBE9E8;
+    --color-sin: #6B7178;
+    --color-sin-bg: #EDECEA;
+
+    --font-display: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+    --radius: 10px;
+    --shadow-card: 0 1px 2px rgba(28,32,36,0.06), 0 4px 16px rgba(28,32,36,0.05);
+    --shadow-modal: 0 20px 60px rgba(28,32,36,0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* =========================================================
+     HEADER
+     ========================================================= */
+  .app-header {
+    background: var(--color-ink);
+    color: #fff;
+    padding: 22px 20px;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .brand-mark {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .brand-text h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  .brand-text p {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+    color: #C9CDD1;
+    max-width: 640px;
+  }
+
+  /* =========================================================
+     LAYOUT PRINCIPAL
+     ========================================================= */
+  .app-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 64px;
+  }
+
+  /* =========================================================
+     DASHBOARD
+     ========================================================= */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: var(--shadow-card);
+    border-top: 3px solid var(--color-ink);
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--color-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .stat-vigente { border-top-color: var(--color-vigente); }
+  .stat-proximo { border-top-color: var(--color-proximo); }
+  .stat-vencido { border-top-color: var(--color-vencido); }
+  .stat-sin { border-top-color: var(--color-sin); }
+
+  /* =========================================================
+     SELECTOR
+     ========================================================= */
+  .selector-section {
+    margin-bottom: 24px;
+  }
+
+  .selector-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .selector-centro {
+    width: 100%;
+    max-width: 420px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5157' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px;
+  }
+
+  .selector-centro:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* =========================================================
+     ESTADO VACÍO
+     ========================================================= */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-ink-soft);
+  }
+
+  .empty-state svg {
+    color: var(--color-border);
+    margin-bottom: 12px;
+  }
+
+  /* =========================================================
+     TARJETAS
+     ========================================================= */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+
+  .info-card-top h2 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  .badge-vigente { background: var(--color-vigente-bg); color: var(--color-vigente); }
+  .badge-proximo { background: var(--color-proximo-bg); color: var(--color-proximo); }
+  .badge-vencido { background: var(--color-vencido-bg); color: var(--color-vencido); }
+  .badge-sin { background: var(--color-sin-bg); color: var(--color-sin); }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 20px 0 8px;
+  }
+
+  .info-grid dt {
+    font-size: 0.76rem;
+    color: var(--color-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+
+  .info-grid dd {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+  }
+
+  .sin-certificado-msg {
+    background: var(--color-sin-bg);
+    color: var(--color-ink-soft);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    margin: 10px 0 0;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 13px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: transform 0.05s ease, background 0.15s ease;
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .btn-primary:disabled {
+    background: var(--color-sin);
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    border: 1px solid var(--color-border);
+  }
+  .btn-secondary:hover { background: #E9E7E3; }
+
+  /* =========================================================
+     HISTORIAL
+     ========================================================= */
+  .historial-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+  }
+
+  .historial-vacio {
+    color: var(--color-ink-soft);
+    font-size: 0.9rem;
+  }
+
+  .historial-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .historial-item:first-child { border-top: none; }
+
+  .historial-item .campo-label {
+    font-size: 0.72rem;
+    color: var(--color-ink-soft);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .historial-item .campo-valor {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .historial-item .btn-ver {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .historial-item .btn-ver:hover { background: #E9E7E3; }
+
+  /* =========================================================
+     MODAL
+     ========================================================= */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(28,32,36,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 480px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal-cerrar {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--color-ink-soft);
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .modal-body {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .form-field .opcional {
+    font-weight: 400;
+    color: var(--color-ink-soft);
+  }
+
+  .form-field input {
+    padding: 11px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .form-field input:disabled {
+    background: var(--color-bg);
+    color: var(--color-ink-soft);
+  }
+
+  .archivo-nombre {
+    font-size: 0.8rem;
+    color: var(--color-ink-soft);
+  }
+
+  .form-error {
+    background: var(--color-vencido-bg);
+    color: var(--color-vencido);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  /* =========================================================
+     TOASTS
+     ========================================================= */
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1100;
+  }
+
+  .toast {
+    background:
