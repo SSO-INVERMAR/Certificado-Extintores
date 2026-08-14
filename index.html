@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservorio de Certificados de Extintores</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v4M8 6l1.5 3M16 6l-1.5 3M6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>Reservorio de Certificados de Extintores</h1>
+          <p>Plataforma para consulta y gestión de certificados de extintores de los centros de trabajo.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section class="dashboard" aria-label="Resumen general">
+      <div class="stat-card" data-stat="total">
+        <span class="stat-value" id="stat-total">–</span>
+        <span class="stat-label">Total centros</span>
+      </div>
+      <div class="stat-card stat-vigente" data-stat="vigentes">
+        <span class="stat-value" id="stat-vigentes">–</span>
+        <span class="stat-label">Vigentes</span>
+      </div>
+      <div class="stat-card stat-proximo" data-stat="proximos">
+        <span class="stat-value" id="stat-proximos">–</span>
+        <span class="stat-label">Próximos a vencer</span>
+      </div>
+      <div class="stat-card stat-vencido" data-stat="vencidos">
+        <span class="stat-value" id="stat-vencidos">–</span>
+        <span class="stat-label">Vencidos</span>
+      </div>
+      <div class="stat-card stat-sin" data-stat="sin">
+        <span class="stat-value" id="stat-sin">–</span>
+        <span class="stat-label">Sin certificado</span>
+      </div>
+    </section>
+
+    <!-- ===================== SELECTOR DE CENTRO ===================== -->
+    <section class="selector-section">
+      <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
+      <select id="selector-centro" class="selector-centro">
+        <option value="" selected disabled>Seleccionar centro de trabajo…</option>
+      </select>
+    </section>
+
+    <!-- ===================== ESTADO VACÍO ===================== -->
+    <section id="empty-state" class="empty-state">
+      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2v4M8 6l1.5 3M16 6l-1.5 3M6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p>Seleccione un centro de trabajo para consultar su certificado.</p>
+    </section>
+
+    <!-- ===================== TARJETA DEL CENTRO ===================== -->
+    <section id="centro-panel" class="centro-panel" hidden>
+
+      <div class="card info-card">
+        <div class="info-card-top">
+          <div>
+            <h2 id="centro-nombre">—</h2>
+            <span id="centro-badge" class="badge">—</span>
+          </div>
+        </div>
+
+        <dl class="info-grid">
+          <div>
+            <dt>Fecha de certificación</dt>
+            <dd id="centro-fecha-cert">—</dd>
+          </div>
+          <div>
+            <dt>Fecha de vencimiento</dt>
+            <dd id="centro-fecha-venc">—</dd>
+          </div>
+          <div>
+            <dt>Días restantes</dt>
+            <dd id="centro-dias">—</dd>
+          </div>
+          <div>
+            <dt>Empresa certificadora</dt>
+            <dd id="centro-empresa">—</dd>
+          </div>
+        </dl>
+
+        <p id="sin-certificado-msg" class="sin-certificado-msg" hidden>
+          Este centro de trabajo no posee un certificado vigente.
+        </p>
+
+        <div class="actions">
+          <button id="btn-descargar" class="btn btn-primary" type="button">
+            📄 Descargar certificado vigente
+          </button>
+          <button id="btn-cargar" class="btn btn-secondary" type="button">
+            ⬆️ Cargar nuevo certificado
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================== HISTORIAL ===================== -->
+      <div class="card historial-card">
+        <h3>Historial de certificados</h3>
+        <div id="historial-lista" class="historial-lista">
+          <p class="historial-vacio">Sin certificados registrados para este centro.</p>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ===================== MODAL: CARGAR CERTIFICADO ===================== -->
+  <div id="modal-cargar" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div class="modal-header">
+        <h3 id="modal-titulo">Cargar nuevo certificado</h3>
+        <button id="modal-cerrar" class="modal-cerrar" type="button" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="form-cargar" class="modal-body">
+        <div class="form-field">
+          <label for="input-centro">Centro de trabajo</label>
+          <input type="text" id="input-centro" disabled>
+        </div>
+
+        <div class="form-field">
+          <label for="input-fecha-cert">Fecha de certificación</label>
+          <input type="date" id="input-fecha-cert" required>
+        </div>
+
+        <div class="form-field">
+          <label for="input-fecha-venc">Fecha de vencimiento</label>
+          <input type="date" id="input-fecha-venc" required>
+        </div>
+
+        <div class="form-field">
+          <label for="input-empresa">Empresa certificadora <span class="opcional">(opcional)</span></label>
+          <input type="text" id="input-empresa" placeholder="Ej: Extintores del Sur Ltda.">
+        </div>
+
+        <div class="form-field">
+          <label for="input-nro-cert">N° de certificado <span class="opcional">(opcional)</span></label>
+          <input type="text" id="input-nro-cert" placeholder="Ej: 2026-0143">
+        </div>
+
+        <div class="form-field">
+          <label for="input-archivo">Archivo PDF</label>
+          <input type="file" id="input-archivo" accept="application/pdf" required>
+          <span id="archivo-nombre" class="archivo-nombre"></span>
+        </div>
+
+        <p id="form-error" class="form-error" hidden></p>
+
+        <div class="modal-actions">
+          <button type="button" id="btn-cancelar" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" id="btn-guardar" class="btn btn-primary">Guardar certificado</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== TOASTS / ALERTAS ===================== -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- ===================== OVERLAY DE CARGA ===================== -->
+  <div id="loading-overlay" class="loading-overlay" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loading-texto">Procesando…</p>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
