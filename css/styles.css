@@ -1,15 +1,23 @@
 /* =========================================================
-     TOKENS DE MARCA — modificar aquí para adaptar a otra empresa
+     TOKENS DE MARCA — Invermar
+     Azul profundo PANTONE 281C #00205B / Dorado PANTONE 16-0836 TCX #C8B273
+     Turquesa #1E618C / Calipso #3185A6 / Gris #95A0AC
      ========================================================= */
   :root {
-    --color-primary: #B3221E;       /* rojo extintor — acento y botón principal */
-    --color-primary-dark: #8C1A17;
-    --color-ink: #1C2024;           /* grafito casi negro — texto y header */
-    --color-ink-soft: #4A5157;
-    --color-bg: #F3F2F0;            /* gris cálido de fondo */
-    --color-surface: #FFFFFF;
-    --color-border: #E1DED9;
+    --color-primary: #00205B;        /* azul profundo — header, botón principal */
+    --color-primary-dark: #001640;
+    --color-accent: #C8B273;         /* dorado — acentos, foco, detalles */
+    --color-turquesa: #1E618C;
+    --color-calipso: #3185A6;
+    --color-gris-marca: #95A0AC;
 
+    --color-ink: #1C2024;
+    --color-ink-soft: #4A5157;
+    --color-bg: #F2F3F5;
+    --color-surface: #FFFFFF;
+    --color-border: #E1E4E8;
+
+    /* Colores de estado: se mantienen semáforo estándar, independientes de la marca */
     --color-vigente: #1E7A4C;
     --color-vigente-bg: #E7F4EC;
     --color-proximo: #B9791A;
@@ -49,9 +57,10 @@
      HEADER
      ========================================================= */
   .app-header {
-    background: var(--color-ink);
+    background: var(--color-primary);
     color: #fff;
-    padding: 22px 20px;
+    padding: 18px 20px;
+    border-bottom: 3px solid var(--color-accent);
   }
 
   .header-inner {
@@ -61,32 +70,30 @@
 
   .brand {
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
   }
 
-  .brand-mark {
+  .brand-logo {
+    height: 40px;
+    width: auto;
     flex-shrink: 0;
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
+    /* El logo original es azul sobre fondo transparente; sobre el header
+       (también azul) se vuelve invisible, así que se invierte a blanco. */
+    filter: brightness(0) invert(1);
   }
 
   .brand-text h1 {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: 0.2px;
   }
 
   .brand-text p {
     margin: 4px 0 0;
-    font-size: 0.9rem;
-    color: #C9CDD1;
+    font-size: 0.88rem;
+    color: #C9D3E0;
     max-width: 640px;
   }
 
@@ -99,36 +106,58 @@
     padding: 24px 20px 64px;
   }
 
+  .section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0 0 12px;
+  }
+
   /* =========================================================
-     DASHBOARD
+     DASHBOARD (3 grupos: Centros / Botes / Artefactos Navales)
      ========================================================= */
+  .dashboard-grupos {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .dashboard-grupo-titulo {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--color-ink-soft);
+    margin: 0 0 8px;
+  }
+
   .dashboard {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-bottom: 28px;
   }
 
   .stat-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    padding: 16px 14px;
+    padding: 14px 14px;
     display: flex;
     flex-direction: column;
     gap: 4px;
     box-shadow: var(--shadow-card);
-    border-top: 3px solid var(--color-ink);
+    border-top: 3px solid var(--color-primary);
   }
 
   .stat-value {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 700;
     font-family: var(--font-display);
   }
 
   .stat-label {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--color-ink-soft);
     text-transform: uppercase;
     letter-spacing: 0.4px;
@@ -140,39 +169,77 @@
   .stat-sin { border-top-color: var(--color-sin); }
 
   /* =========================================================
-     SELECTOR
+     SELECTORES DE ACTIVO (Centro / Bote / Artefacto Naval)
      ========================================================= */
-  .selector-section {
+  .selectores-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
     margin-bottom: 24px;
+  }
+
+  .selector-bloque {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .selector-bloque.activo {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(200,178,115,0.35), var(--shadow-card);
   }
 
   .selector-label {
     display: block;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin-bottom: 8px;
   }
 
-  .selector-centro {
+  .selector-centro,
+  .selector-texto {
     width: 100%;
-    max-width: 420px;
-    padding: 12px 14px;
-    font-size: 1rem;
+    padding: 11px 12px;
+    font-size: 0.95rem;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    border-radius: 8px;
     background: var(--color-surface);
     color: var(--color-ink);
+  }
+
+  .selector-centro {
     appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5157' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 18px;
+    padding-right: 36px;
   }
 
+  .selector-texto-fila {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-consultar {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-consultar:hover { background: var(--color-primary-dark); }
+
   .selector-centro:focus-visible,
+  .selector-texto:focus-visible,
   button:focus-visible,
   input:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
@@ -204,6 +271,16 @@
 
   .info-card-top h2 {
     font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  .tipo-activo-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-turquesa);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
     margin-bottom: 8px;
   }
 
@@ -254,6 +331,16 @@
     margin: 10px 0 0;
   }
 
+  .reemplazo-aviso {
+    background: #FBF6EA;
+    color: #8A6A1F;
+    border: 1px solid #EEDFB8;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    margin: 0 0 16px;
+  }
+
   .actions {
     display: flex;
     gap: 12px;
@@ -287,55 +374,7 @@
     color: var(--color-ink);
     border: 1px solid var(--color-border);
   }
-  .btn-secondary:hover { background: #E9E7E3; }
-
-  /* =========================================================
-     HISTORIAL
-     ========================================================= */
-  .historial-card h3 {
-    font-size: 1.05rem;
-    margin-bottom: 14px;
-  }
-
-  .historial-vacio {
-    color: var(--color-ink-soft);
-    font-size: 0.9rem;
-  }
-
-  .historial-item {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto auto;
-    gap: 14px;
-    align-items: center;
-    padding: 14px 0;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .historial-item:first-child { border-top: none; }
-
-  .historial-item .campo-label {
-    font-size: 0.72rem;
-    color: var(--color-ink-soft);
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  .historial-item .campo-valor {
-    font-size: 0.92rem;
-    font-weight: 600;
-  }
-
-  .historial-item .btn-ver {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .historial-item .btn-ver:hover { background: #E9E7E3; }
+  .btn-secondary:hover { background: #E7E9EC; }
 
   /* =========================================================
      MODAL
@@ -383,6 +422,16 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .modal-aviso {
+    background: #FBF6EA;
+    color: #8A6A1F;
+    border: 1px solid #EEDFB8;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    margin: 0;
   }
 
   .form-field {
@@ -505,13 +554,9 @@
      RESPONSIVE
      ========================================================= */
   @media (max-width: 860px) {
-    .dashboard { grid-template-columns: repeat(3, 1fr); }
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .selectores-section { grid-template-columns: 1fr; }
     .info-grid { grid-template-columns: repeat(2, 1fr); }
-    .historial-item {
-      grid-template-columns: 1fr 1fr;
-      row-gap: 10px;
-    }
-    .historial-item .btn-ver { grid-column: span 2; }
   }
 
   @media (max-width: 560px) {
@@ -519,8 +564,8 @@
     .info-grid { grid-template-columns: 1fr 1fr; }
     .actions { flex-direction: column; }
     .actions .btn { width: 100%; }
-    .brand { flex-direction: row; }
-    .brand-text h1 { font-size: 1.1rem; }
+    .brand-text h1 { font-size: 1.05rem; }
+    .brand-logo { height: 32px; }
   }
 
   /* =========================================================
