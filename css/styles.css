@@ -569,6 +569,94 @@
   }
 
   /* =========================================================
+     LISTAS DE BOTES / ARTEFACTOS NAVALES (dentro del panel del centro)
+     ========================================================= */
+  .lista-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+  }
+
+  .lista-vacia {
+    color: var(--color-ink-soft);
+    font-size: 0.88rem;
+    margin: 0 0 16px;
+  }
+
+  .lista-activos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .activo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg);
+  }
+
+  .activo-item-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .activo-item-nombre {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .activo-item-detalle {
+    font-size: 0.8rem;
+    color: var(--color-ink-soft);
+  }
+
+  .activo-item-acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-mini {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-mini:hover { background: #E7E9EC; }
+
+  .btn-mini-primary {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .btn-mini-primary:hover { background: var(--color-primary-dark); }
+
+  .agregar-activo-fila {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .agregar-activo-fila .selector-texto {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  /* =========================================================
      FIX: el atributo HTML "hidden" pierde contra display:flex
      declarado en estas clases si no se refuerza explícitamente.
      ========================================================= */
