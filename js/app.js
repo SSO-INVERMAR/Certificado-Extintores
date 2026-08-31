@@ -1,7 +1,7 @@
 // ============================================================
 // ESTADO EN MEMORIA
 // ============================================================
-let centroActual = null;
+let activoActual = { tipo: null, nombre: null };
 
 const ESTADO_META = {
   VIGENTE:          { texto: '🟢 Vigente',           badge: 'badge-vigente' },
@@ -10,11 +10,15 @@ const ESTADO_META = {
   SIN_CERTIFICADO:  { texto: '⚪ Sin certificado',   badge: 'badge-sin' }
 };
 
+const TIPO_LABEL = {
+  CENTRO: 'Centro de Trabajo',
+  BOTE: 'Bote',
+  ARTEFACTO_NAVAL: 'Artefacto Naval'
+};
+
 // ============================================================
 // LLAMADAS A LA API
 // ============================================================
-
-/** GET a la API de Apps Script. Las peticiones GET no disparan preflight CORS. */
 async function apiGet(action, params) {
   const url = new URL(API_URL);
   url.searchParams.set('action', action);
@@ -26,14 +30,6 @@ async function apiGet(action, params) {
   return json.data;
 }
 
-/**
- * POST a la API de Apps Script.
- * OJO: se envía con Content-Type: text/plain a propósito. Apps Script no
- * responde peticiones OPTIONS (preflight), así que si mandáramos
- * "application/json" el navegador bloquearía la petición antes de enviarla.
- * Con "text/plain" el navegador la trata como "petición simple" y no hace
- * preflight; el servidor de todas formas parsea el cuerpo con JSON.parse().
- */
 async function apiPost(action, payload) {
   const resp = await fetch(API_URL, {
     method: 'POST',
@@ -55,7 +51,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function configurarEventos() {
-  document.getElementById('selector-centro').addEventListener('change', onSeleccionarCentro);
+  document.getElementById('selector-centro').addEventListener('change', (e) => {
+    if (!e.target.value) return;
+    seleccionarActivo('CENTRO', e.target.value);
+  });
+
+  document.getElementById('btn-buscar-bote').addEventListener('click', () => {
+    const nombre = document.getElementById('input-bote').value.trim();
+    if (!nombre) return mostrarToast('Escriba el nombre o código del bote.', 'error');
+    seleccionarActivo('BOTE', nombre);
+  });
+  document.getElementById('input-bote').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-buscar-bote').click(); }
+  });
+
+  document.getElementById('btn-buscar-artefacto').addEventListener('click', () => {
+    const nombre = document.getElementById('input-artefacto').value.trim();
+    if (!nombre) return mostrarToast('Escriba el nombre o código del artefacto naval.', 'error');
+    seleccionarActivo('ARTEFACTO_NAVAL', nombre);
+  });
+  document.getElementById('input-artefacto').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-buscar-artefacto').click(); }
+  });
+
   document.getElementById('btn-cargar').addEventListener('click', abrirModal);
   document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
   document.getElementById('modal-cerrar').addEventListener('click', cerrarModal);
@@ -73,90 +91,102 @@ function configurarEventos() {
 async function cargarCentros() {
   try {
     const centros = await apiGet('centros');
-    renderSelectorCentros(centros);
+    const select = document.getElementById('selector-centro');
+    centros.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.nombre;
+      opt.textContent = c.nombre;
+      select.appendChild(opt);
+    });
   } catch (err) {
     mostrarToast('No se pudo cargar la lista de centros. Recargue la página.', 'error');
   }
 }
 
-function renderSelectorCentros(centros) {
-  const select = document.getElementById('selector-centro');
-  centros.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.nombre;
-    opt.textContent = c.nombre;
-    select.appendChild(opt);
-  });
-}
-
 async function cargarDashboard() {
   try {
     const stats = await apiGet('dashboard');
-    renderDashboard(stats);
+    pintarGrupoDashboard('centro', stats.centros);
+    pintarGrupoDashboard('bote', stats.botes);
+    pintarGrupoDashboard('artefacto', stats.artefactosNavales);
   } catch (err) {
     // El dashboard es informativo; si falla, no interrumpimos el resto de la app.
   }
 }
 
-function renderDashboard(stats) {
-  document.getElementById('stat-total').textContent = stats.totalCentros;
-  document.getElementById('stat-vigentes').textContent = stats.vigentes;
-  document.getElementById('stat-proximos').textContent = stats.proximosAVencer;
-  document.getElementById('stat-vencidos').textContent = stats.vencidos;
-  document.getElementById('stat-sin').textContent = stats.sinCertificado;
+function pintarGrupoDashboard(prefijo, stats) {
+  document.getElementById(`stat-${prefijo}-total`).textContent = stats.total;
+  document.getElementById(`stat-${prefijo}-vigentes`).textContent = stats.vigentes;
+  document.getElementById(`stat-${prefijo}-proximos`).textContent = stats.proximosAVencer;
+  document.getElementById(`stat-${prefijo}-vencidos`).textContent = stats.vencidos;
 }
 
 // ============================================================
-// SELECCIÓN DE CENTRO
+// SELECCIÓN DE ACTIVO
 // ============================================================
-async function onSeleccionarCentro(e) {
-  centroActual = e.target.value;
-  if (!centroActual) return;
+async function seleccionarActivo(tipo, nombre) {
+  activoActual = { tipo, nombre };
+  resaltarBloqueActivo(tipo);
 
   document.getElementById('empty-state').hidden = true;
-  document.getElementById('centro-panel').hidden = false;
-  document.getElementById('centro-nombre').textContent = centroActual;
+  document.getElementById('activo-panel').hidden = false;
+  document.getElementById('activo-tipo-label').textContent = TIPO_LABEL[tipo] || tipo;
+  document.getElementById('activo-nombre').textContent = nombre;
 
   mostrarCargando('Consultando certificado…');
   try {
-    const info = await apiGet('infoCentro', { centro: centroActual });
-    renderInfoCentro(info);
+    const info = await apiGet('infoActivo', { tipo, nombre });
+    renderInfoActivo(info);
   } catch (err) {
-    mostrarToast('Error al consultar el centro: ' + err.message, 'error');
+    mostrarToast('Error al consultar el activo: ' + err.message, 'error');
   } finally {
     ocultarCargando();
   }
 }
 
-function renderInfoCentro(info) {
+/** Marca visualmente cuál de los 3 bloques está activo y limpia los otros dos. */
+function resaltarBloqueActivo(tipo) {
+  document.getElementById('bloque-centro').classList.toggle('activo', tipo === 'CENTRO');
+  document.getElementById('bloque-bote').classList.toggle('activo', tipo === 'BOTE');
+  document.getElementById('bloque-artefacto').classList.toggle('activo', tipo === 'ARTEFACTO_NAVAL');
+
+  if (tipo !== 'CENTRO') document.getElementById('selector-centro').value = '';
+  if (tipo !== 'BOTE') document.getElementById('input-bote').value = '';
+  if (tipo !== 'ARTEFACTO_NAVAL') document.getElementById('input-artefacto').value = '';
+
+  // Conserva en el campo activo lo que el usuario buscó, para que se vea qué está consultando.
+  if (tipo === 'BOTE') document.getElementById('input-bote').value = activoActual.nombre;
+  if (tipo === 'ARTEFACTO_NAVAL') document.getElementById('input-artefacto').value = activoActual.nombre;
+  if (tipo === 'CENTRO') document.getElementById('selector-centro').value = activoActual.nombre;
+}
+
+function renderInfoActivo(info) {
   const meta = ESTADO_META[info.estado] || ESTADO_META.SIN_CERTIFICADO;
-  const badge = document.getElementById('centro-badge');
+  const badge = document.getElementById('activo-badge');
   badge.textContent = meta.texto;
   badge.className = 'badge ' + meta.badge;
 
-  const cert = info.certificadoVigente;
+  const cert = info.certificado;
   const sinMsg = document.getElementById('sin-certificado-msg');
   const btnDescargar = document.getElementById('btn-descargar');
 
   if (cert && info.estado !== 'SIN_CERTIFICADO') {
-    document.getElementById('centro-fecha-cert').textContent = cert.fechaCertificacion || '—';
-    document.getElementById('centro-fecha-venc').textContent = cert.fechaVencimiento || '—';
-    document.getElementById('centro-dias').textContent = formatearDias(cert.diasRestantes);
-    document.getElementById('centro-empresa').textContent = cert.empresaCertificadora || '—';
+    document.getElementById('activo-fecha-cert').textContent = cert.fechaCertificacion || '—';
+    document.getElementById('activo-fecha-venc').textContent = cert.fechaVencimiento || '—';
+    document.getElementById('activo-dias').textContent = formatearDias(cert.diasRestantes);
+    document.getElementById('activo-empresa').textContent = cert.empresaCertificadora || '—';
     sinMsg.hidden = true;
     btnDescargar.disabled = false;
     btnDescargar.dataset.url = cert.urlArchivo || '';
   } else {
-    document.getElementById('centro-fecha-cert').textContent = '—';
-    document.getElementById('centro-fecha-venc').textContent = '—';
-    document.getElementById('centro-dias').textContent = '—';
-    document.getElementById('centro-empresa').textContent = '—';
+    document.getElementById('activo-fecha-cert').textContent = '—';
+    document.getElementById('activo-fecha-venc').textContent = '—';
+    document.getElementById('activo-dias').textContent = '—';
+    document.getElementById('activo-empresa').textContent = '—';
     sinMsg.hidden = false;
     btnDescargar.disabled = true;
     btnDescargar.dataset.url = '';
   }
-
-  renderHistorial(info.historial || []);
 }
 
 function formatearDias(dias) {
@@ -166,50 +196,10 @@ function formatearDias(dias) {
   return dias + ' días';
 }
 
-function renderHistorial(historial) {
-  const cont = document.getElementById('historial-lista');
-  cont.innerHTML = '';
-
-  if (historial.length === 0) {
-    cont.innerHTML = '<p class="historial-vacio">Sin certificados registrados para este centro.</p>';
-    return;
-  }
-
-  historial.forEach(c => {
-    const meta = ESTADO_META[c.estado] || ESTADO_META.SIN_CERTIFICADO;
-    const item = document.createElement('div');
-    item.className = 'historial-item';
-    item.innerHTML = `
-      <div>
-        <span class="campo-label">Certificación</span>
-        <span class="campo-valor">${escapeHtml(c.fechaCertificacion || '—')}</span>
-      </div>
-      <div>
-        <span class="campo-label">Vencimiento</span>
-        <span class="campo-valor">${escapeHtml(c.fechaVencimiento || '—')}</span>
-      </div>
-      <div>
-        <span class="campo-label">Empresa certificadora</span>
-        <span class="campo-valor">${escapeHtml(c.empresaCertificadora || '—')}</span>
-      </div>
-      <div>
-        <span class="campo-label">Estado</span>
-        <span class="badge ${meta.badge}">${meta.texto}</span>
-      </div>
-      <button type="button" class="btn-ver" data-url="${escapeHtml(c.urlArchivo || '')}">Ver / Descargar</button>
-    `;
-    item.querySelector('.btn-ver').addEventListener('click', (e) => {
-      const url = e.target.dataset.url;
-      if (url) window.open(url, '_blank');
-    });
-    cont.appendChild(item);
-  });
-}
-
 function descargarCertificadoVigente() {
   const url = document.getElementById('btn-descargar').dataset.url;
   if (!url) {
-    mostrarToast('Este centro de trabajo no posee un certificado vigente.', 'error');
+    mostrarToast('Este activo no posee un certificado vigente.', 'error');
     return;
   }
   window.open(url, '_blank');
@@ -219,10 +209,11 @@ function descargarCertificadoVigente() {
 // MODAL DE CARGA
 // ============================================================
 function abrirModal() {
-  if (!centroActual) return;
+  if (!activoActual.tipo || !activoActual.nombre) return;
   document.getElementById('form-error').hidden = true;
   document.getElementById('form-cargar').reset();
-  document.getElementById('input-centro').value = centroActual;
+  document.getElementById('input-activo-nombre').value =
+    `${activoActual.nombre} (${TIPO_LABEL[activoActual.tipo] || activoActual.tipo})`;
   document.getElementById('archivo-nombre').textContent = '';
   document.getElementById('modal-cargar').hidden = false;
 }
@@ -249,7 +240,7 @@ async function onSubmitCargar(e) {
   const archivoInput = document.getElementById('input-archivo');
   const archivo = archivoInput.files[0];
 
-  if (!centroActual) return mostrarErrorForm('Debe seleccionar un centro de trabajo.');
+  if (!activoActual.tipo || !activoActual.nombre) return mostrarErrorForm('Debe seleccionar un activo primero.');
   if (!archivo) return mostrarErrorForm('Debe seleccionar un archivo.');
   if (archivo.type !== 'application/pdf') return mostrarErrorForm('El archivo debe ser un PDF.');
   if (!fechaCert) return mostrarErrorForm('Debe indicar la fecha de certificación.');
@@ -263,7 +254,8 @@ async function onSubmitCargar(e) {
     mostrarCargando('Subiendo certificado…');
 
     await apiPost('subirCertificado', {
-      centro: centroActual,
+      tipoActivo: activoActual.tipo,
+      nombreActivo: activoActual.nombre,
       fechaCertificacion: fechaCert,
       fechaVencimiento: fechaVenc,
       empresaCertificadora: empresa,
@@ -274,8 +266,8 @@ async function onSubmitCargar(e) {
     });
 
     cerrarModal();
-    mostrarToast('Certificado cargado correctamente.', 'success');
-    onSeleccionarCentro({ target: { value: centroActual } });
+    mostrarToast('Certificado cargado correctamente. El anterior fue reemplazado.', 'success');
+    seleccionarActivo(activoActual.tipo, activoActual.nombre);
     cargarDashboard();
   } catch (err) {
     mostrarErrorForm(err.message || 'Ocurrió un error al guardar el certificado.');
@@ -318,10 +310,4 @@ function mostrarToast(mensaje, tipo) {
   toast.textContent = mensaje;
   cont.appendChild(toast);
   setTimeout(() => toast.remove(), 4500);
-}
-
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
