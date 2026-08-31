@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reservorio de Certificados de Extintores</title>
+  <title>Reservorio de Certificados de Extintores — Invermar</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -12,14 +12,10 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2v4M8 6l1.5 3M16 6l-1.5 3M6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
+        <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo">
         <div class="brand-text">
           <h1>Reservorio de Certificados de Extintores</h1>
-          <p>Plataforma para consulta y gestión de certificados de extintores de los centros de trabajo.</p>
+          <p>Plataforma para consulta y gestión de certificados de extintores de centros de trabajo, botes y artefactos navales.</p>
         </div>
       </div>
     </div>
@@ -28,35 +24,67 @@
   <main class="app-main">
 
     <!-- ===================== DASHBOARD ===================== -->
-    <section class="dashboard" aria-label="Resumen general">
-      <div class="stat-card" data-stat="total">
-        <span class="stat-value" id="stat-total">–</span>
-        <span class="stat-label">Total centros</span>
+    <section class="dashboard-grupos" aria-label="Resumen general">
+
+      <div>
+        <p class="dashboard-grupo-titulo">Centros de trabajo</p>
+        <div class="dashboard">
+          <div class="stat-card"><span class="stat-value" id="stat-centro-total">–</span><span class="stat-label">Total</span></div>
+          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-centro-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-centro-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-centro-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+        </div>
       </div>
-      <div class="stat-card stat-vigente" data-stat="vigentes">
-        <span class="stat-value" id="stat-vigentes">–</span>
-        <span class="stat-label">Vigentes</span>
+
+      <div>
+        <p class="dashboard-grupo-titulo">Botes</p>
+        <div class="dashboard">
+          <div class="stat-card"><span class="stat-value" id="stat-bote-total">–</span><span class="stat-label">Con certificado</span></div>
+          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-bote-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-bote-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-bote-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+        </div>
       </div>
-      <div class="stat-card stat-proximo" data-stat="proximos">
-        <span class="stat-value" id="stat-proximos">–</span>
-        <span class="stat-label">Próximos a vencer</span>
+
+      <div>
+        <p class="dashboard-grupo-titulo">Artefactos navales</p>
+        <div class="dashboard">
+          <div class="stat-card"><span class="stat-value" id="stat-artefacto-total">–</span><span class="stat-label">Con certificado</span></div>
+          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-artefacto-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-artefacto-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-artefacto-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+        </div>
       </div>
-      <div class="stat-card stat-vencido" data-stat="vencidos">
-        <span class="stat-value" id="stat-vencidos">–</span>
-        <span class="stat-label">Vencidos</span>
-      </div>
-      <div class="stat-card stat-sin" data-stat="sin">
-        <span class="stat-value" id="stat-sin">–</span>
-        <span class="stat-label">Sin certificado</span>
-      </div>
+
     </section>
 
-    <!-- ===================== SELECTOR DE CENTRO ===================== -->
-    <section class="selector-section">
-      <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
-      <select id="selector-centro" class="selector-centro">
-        <option value="" selected disabled>Seleccionar centro de trabajo…</option>
-      </select>
+    <!-- ===================== SELECTORES DE ACTIVO ===================== -->
+    <p class="section-title">Consultar certificado por:</p>
+    <section class="selectores-section">
+
+      <div class="selector-bloque" id="bloque-centro">
+        <label for="selector-centro" class="selector-label">Centro de trabajo</label>
+        <select id="selector-centro" class="selector-centro">
+          <option value="" selected>Seleccionar centro de trabajo…</option>
+        </select>
+      </div>
+
+      <div class="selector-bloque" id="bloque-bote">
+        <label for="input-bote" class="selector-label">Bote</label>
+        <div class="selector-texto-fila">
+          <input type="text" id="input-bote" class="selector-texto" placeholder="Nombre o código del bote">
+          <button type="button" id="btn-buscar-bote" class="btn-consultar">Consultar</button>
+        </div>
+      </div>
+
+      <div class="selector-bloque" id="bloque-artefacto">
+        <label for="input-artefacto" class="selector-label">Artefacto Naval</label>
+        <div class="selector-texto-fila">
+          <input type="text" id="input-artefacto" class="selector-texto" placeholder="Nombre o código del artefacto">
+          <button type="button" id="btn-buscar-artefacto" class="btn-consultar">Consultar</button>
+        </div>
+      </div>
+
     </section>
 
     <!-- ===================== ESTADO VACÍO ===================== -->
@@ -64,41 +92,40 @@
       <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M12 2v4M8 6l1.5 3M16 6l-1.5 3M6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <p>Seleccione un centro de trabajo para consultar su certificado.</p>
+      <p>Seleccione un centro, escriba un bote o un artefacto naval para consultar su certificado.</p>
     </section>
 
-    <!-- ===================== TARJETA DEL CENTRO ===================== -->
-    <section id="centro-panel" class="centro-panel" hidden>
+    <!-- ===================== TARJETA DEL ACTIVO ===================== -->
+    <section id="activo-panel" class="activo-panel" hidden>
 
       <div class="card info-card">
         <div class="info-card-top">
-          <div>
-            <h2 id="centro-nombre">—</h2>
-            <span id="centro-badge" class="badge">—</span>
-          </div>
+          <span id="activo-tipo-label" class="tipo-activo-label">—</span>
+          <h2 id="activo-nombre">—</h2>
+          <span id="activo-badge" class="badge">—</span>
         </div>
 
         <dl class="info-grid">
           <div>
             <dt>Fecha de certificación</dt>
-            <dd id="centro-fecha-cert">—</dd>
+            <dd id="activo-fecha-cert">—</dd>
           </div>
           <div>
             <dt>Fecha de vencimiento</dt>
-            <dd id="centro-fecha-venc">—</dd>
+            <dd id="activo-fecha-venc">—</dd>
           </div>
           <div>
             <dt>Días restantes</dt>
-            <dd id="centro-dias">—</dd>
+            <dd id="activo-dias">—</dd>
           </div>
           <div>
             <dt>Empresa certificadora</dt>
-            <dd id="centro-empresa">—</dd>
+            <dd id="activo-empresa">—</dd>
           </div>
         </dl>
 
         <p id="sin-certificado-msg" class="sin-certificado-msg" hidden>
-          Este centro de trabajo no posee un certificado vigente.
+          Este activo no posee un certificado vigente.
         </p>
 
         <div class="actions">
@@ -108,14 +135,6 @@
           <button id="btn-cargar" class="btn btn-secondary" type="button">
             ⬆️ Cargar nuevo certificado
           </button>
-        </div>
-      </div>
-
-      <!-- ===================== HISTORIAL ===================== -->
-      <div class="card historial-card">
-        <h3>Historial de certificados</h3>
-        <div id="historial-lista" class="historial-lista">
-          <p class="historial-vacio">Sin certificados registrados para este centro.</p>
         </div>
       </div>
 
@@ -131,9 +150,13 @@
       </div>
 
       <form id="form-cargar" class="modal-body">
+        <p class="modal-aviso">
+          Al guardar, se reemplazará automáticamente el certificado anterior de este activo (si existía).
+        </p>
+
         <div class="form-field">
-          <label for="input-centro">Centro de trabajo</label>
-          <input type="text" id="input-centro" disabled>
+          <label for="input-activo-nombre">Activo</label>
+          <input type="text" id="input-activo-nombre" disabled>
         </div>
 
         <div class="form-field">
