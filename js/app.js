@@ -1,7 +1,11 @@
 // ============================================================
 // ESTADO EN MEMORIA
 // ============================================================
-let activoActual = { tipo: null, nombre: null };
+let centroActual = null;
+
+// Contexto del activo que se está por cargar en el modal (se define
+// justo antes de abrir el modal, según qué botón se presionó).
+let contextoModal = { tipoActivo: null, nombreActivo: null };
 
 const ESTADO_META = {
   VIGENTE:          { texto: '🟢 Vigente',           badge: 'badge-vigente' },
@@ -53,34 +57,42 @@ document.addEventListener('DOMContentLoaded', () => {
 function configurarEventos() {
   document.getElementById('selector-centro').addEventListener('change', (e) => {
     if (!e.target.value) return;
-    seleccionarActivo('CENTRO', e.target.value);
+    seleccionarCentro(e.target.value);
   });
 
-  document.getElementById('btn-buscar-bote').addEventListener('click', () => {
-    const nombre = document.getElementById('input-bote').value.trim();
+  document.getElementById('btn-descargar-centro').addEventListener('click', () => {
+    const url = document.getElementById('btn-descargar-centro').dataset.url;
+    if (!url) return mostrarToast('Este centro no posee un certificado vigente.', 'error');
+    window.open(url, '_blank');
+  });
+
+  document.getElementById('btn-cargar-centro').addEventListener('click', () => {
+    abrirModal('CENTRO', centroActual);
+  });
+
+  document.getElementById('btn-agregar-bote').addEventListener('click', () => {
+    const nombre = document.getElementById('input-nuevo-bote').value.trim();
     if (!nombre) return mostrarToast('Escriba el nombre o código del bote.', 'error');
-    seleccionarActivo('BOTE', nombre);
+    abrirModal('BOTE', nombre);
   });
-  document.getElementById('input-bote').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-buscar-bote').click(); }
+  document.getElementById('input-nuevo-bote').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-agregar-bote').click(); }
   });
 
-  document.getElementById('btn-buscar-artefacto').addEventListener('click', () => {
-    const nombre = document.getElementById('input-artefacto').value.trim();
+  document.getElementById('btn-agregar-artefacto').addEventListener('click', () => {
+    const nombre = document.getElementById('input-nuevo-artefacto').value.trim();
     if (!nombre) return mostrarToast('Escriba el nombre o código del artefacto naval.', 'error');
-    seleccionarActivo('ARTEFACTO_NAVAL', nombre);
+    abrirModal('ARTEFACTO_NAVAL', nombre);
   });
-  document.getElementById('input-artefacto').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-buscar-artefacto').click(); }
+  document.getElementById('input-nuevo-artefacto').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-agregar-artefacto').click(); }
   });
 
-  document.getElementById('btn-cargar').addEventListener('click', abrirModal);
   document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
   document.getElementById('modal-cerrar').addEventListener('click', cerrarModal);
   document.getElementById('modal-cargar').addEventListener('click', (e) => {
     if (e.target.id === 'modal-cargar') cerrarModal();
   });
-  document.getElementById('btn-descargar').addEventListener('click', descargarCertificadoVigente);
   document.getElementById('form-cargar').addEventListener('submit', onSubmitCargar);
   document.getElementById('input-archivo').addEventListener('change', onSeleccionarArchivo);
 }
@@ -122,71 +134,107 @@ function pintarGrupoDashboard(prefijo, stats) {
 }
 
 // ============================================================
-// SELECCIÓN DE ACTIVO
+// SELECCIÓN DE CENTRO
 // ============================================================
-async function seleccionarActivo(tipo, nombre) {
-  activoActual = { tipo, nombre };
-  resaltarBloqueActivo(tipo);
+async function seleccionarCentro(centro) {
+  centroActual = centro;
 
   document.getElementById('empty-state').hidden = true;
-  document.getElementById('activo-panel').hidden = false;
-  document.getElementById('activo-tipo-label').textContent = TIPO_LABEL[tipo] || tipo;
-  document.getElementById('activo-nombre').textContent = nombre;
+  document.getElementById('centro-panel').hidden = false;
+  document.getElementById('centro-nombre').textContent = centro;
 
-  mostrarCargando('Consultando certificado…');
+  mostrarCargando('Consultando centro…');
   try {
-    const info = await apiGet('infoActivo', { tipo, nombre });
-    renderInfoActivo(info);
+    const info = await apiGet('infoCentroCompleto', { centro });
+    renderCentroCompleto(info);
   } catch (err) {
-    mostrarToast('Error al consultar el activo: ' + err.message, 'error');
+    mostrarToast('Error al consultar el centro: ' + err.message, 'error');
   } finally {
     ocultarCargando();
   }
 }
 
-/** Marca visualmente cuál de los 3 bloques está activo y limpia los otros dos. */
-function resaltarBloqueActivo(tipo) {
-  document.getElementById('bloque-centro').classList.toggle('activo', tipo === 'CENTRO');
-  document.getElementById('bloque-bote').classList.toggle('activo', tipo === 'BOTE');
-  document.getElementById('bloque-artefacto').classList.toggle('activo', tipo === 'ARTEFACTO_NAVAL');
-
-  if (tipo !== 'CENTRO') document.getElementById('selector-centro').value = '';
-  if (tipo !== 'BOTE') document.getElementById('input-bote').value = '';
-  if (tipo !== 'ARTEFACTO_NAVAL') document.getElementById('input-artefacto').value = '';
-
-  // Conserva en el campo activo lo que el usuario buscó, para que se vea qué está consultando.
-  if (tipo === 'BOTE') document.getElementById('input-bote').value = activoActual.nombre;
-  if (tipo === 'ARTEFACTO_NAVAL') document.getElementById('input-artefacto').value = activoActual.nombre;
-  if (tipo === 'CENTRO') document.getElementById('selector-centro').value = activoActual.nombre;
-}
-
-function renderInfoActivo(info) {
-  const meta = ESTADO_META[info.estado] || ESTADO_META.SIN_CERTIFICADO;
-  const badge = document.getElementById('activo-badge');
+function renderCentroCompleto(info) {
+  // --- Certificado propio del centro ---
+  const meta = ESTADO_META[info.estadoCentro] || ESTADO_META.SIN_CERTIFICADO;
+  const badge = document.getElementById('centro-badge');
   badge.textContent = meta.texto;
   badge.className = 'badge ' + meta.badge;
 
-  const cert = info.certificado;
-  const sinMsg = document.getElementById('sin-certificado-msg');
-  const btnDescargar = document.getElementById('btn-descargar');
+  const cert = info.certificadoCentro;
+  const sinMsg = document.getElementById('centro-sin-certificado-msg');
+  const btnDescargar = document.getElementById('btn-descargar-centro');
 
-  if (cert && info.estado !== 'SIN_CERTIFICADO') {
-    document.getElementById('activo-fecha-cert').textContent = cert.fechaCertificacion || '—';
-    document.getElementById('activo-fecha-venc').textContent = cert.fechaVencimiento || '—';
-    document.getElementById('activo-dias').textContent = formatearDias(cert.diasRestantes);
-    document.getElementById('activo-empresa').textContent = cert.empresaCertificadora || '—';
+  if (cert && info.estadoCentro !== 'SIN_CERTIFICADO') {
+    document.getElementById('centro-fecha-cert').textContent = cert.fechaCertificacion || '—';
+    document.getElementById('centro-fecha-venc').textContent = cert.fechaVencimiento || '—';
+    document.getElementById('centro-dias').textContent = formatearDias(cert.diasRestantes);
+    document.getElementById('centro-empresa').textContent = cert.empresaCertificadora || '—';
     sinMsg.hidden = true;
     btnDescargar.disabled = false;
     btnDescargar.dataset.url = cert.urlArchivo || '';
   } else {
-    document.getElementById('activo-fecha-cert').textContent = '—';
-    document.getElementById('activo-fecha-venc').textContent = '—';
-    document.getElementById('activo-dias').textContent = '—';
-    document.getElementById('activo-empresa').textContent = '—';
+    document.getElementById('centro-fecha-cert').textContent = '—';
+    document.getElementById('centro-fecha-venc').textContent = '—';
+    document.getElementById('centro-dias').textContent = '—';
+    document.getElementById('centro-empresa').textContent = '—';
     sinMsg.hidden = false;
     btnDescargar.disabled = true;
     btnDescargar.dataset.url = '';
   }
+
+  // --- Botes y Artefactos Navales ---
+  renderListaActivos('lista-botes', info.botes, 'BOTE');
+  renderListaActivos('lista-artefactos', info.artefactosNavales, 'ARTEFACTO_NAVAL');
+
+  // Limpiar los campos de "agregar nuevo"
+  document.getElementById('input-nuevo-bote').value = '';
+  document.getElementById('input-nuevo-artefacto').value = '';
+}
+
+function renderListaActivos(contenedorId, items, tipoActivo) {
+  const cont = document.getElementById(contenedorId);
+  cont.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    const vacio = document.createElement('p');
+    vacio.className = 'lista-vacia';
+    vacio.textContent = tipoActivo === 'BOTE'
+      ? 'Este centro no tiene botes con certificado registrado todavía.'
+      : 'Este centro no tiene artefactos navales con certificado registrado todavía.';
+    cont.appendChild(vacio);
+    return;
+  }
+
+  items.forEach(item => {
+    const meta = ESTADO_META[item.estado] || ESTADO_META.SIN_CERTIFICADO;
+    const cert = item.certificado;
+
+    const row = document.createElement('div');
+    row.className = 'activo-item';
+    row.innerHTML = `
+      <div class="activo-item-info">
+        <span class="activo-item-nombre">${escapeHtml(item.nombre)}</span>
+        <span class="badge ${meta.badge}">${meta.texto}</span>
+        ${cert ? `<span class="activo-item-detalle">Vence: ${escapeHtml(cert.fechaVencimiento || '—')}</span>` : ''}
+      </div>
+      <div class="activo-item-acciones">
+        <button type="button" class="btn-mini btn-ver" ${cert && cert.urlArchivo ? '' : 'disabled'}>Descargar</button>
+        <button type="button" class="btn-mini btn-mini-primary btn-actualizar">Actualizar certificado</button>
+      </div>
+    `;
+
+    const btnVer = row.querySelector('.btn-ver');
+    if (cert && cert.urlArchivo) {
+      btnVer.addEventListener('click', () => window.open(cert.urlArchivo, '_blank'));
+    }
+
+    row.querySelector('.btn-actualizar').addEventListener('click', () => {
+      abrirModal(tipoActivo, item.nombre);
+    });
+
+    cont.appendChild(row);
+  });
 }
 
 function formatearDias(dias) {
@@ -196,24 +244,22 @@ function formatearDias(dias) {
   return dias + ' días';
 }
 
-function descargarCertificadoVigente() {
-  const url = document.getElementById('btn-descargar').dataset.url;
-  if (!url) {
-    mostrarToast('Este activo no posee un certificado vigente.', 'error');
-    return;
-  }
-  window.open(url, '_blank');
-}
-
 // ============================================================
 // MODAL DE CARGA
 // ============================================================
-function abrirModal() {
-  if (!activoActual.tipo || !activoActual.nombre) return;
+function abrirModal(tipoActivo, nombreActivo) {
+  if (!centroActual) return;
+  contextoModal = { tipoActivo, nombreActivo };
+
   document.getElementById('form-error').hidden = true;
   document.getElementById('form-cargar').reset();
-  document.getElementById('input-activo-nombre').value =
-    `${activoActual.nombre} (${TIPO_LABEL[activoActual.tipo] || activoActual.tipo})`;
+
+  const etiquetaTipo = TIPO_LABEL[tipoActivo] || tipoActivo;
+  document.getElementById('modal-titulo').textContent =
+    tipoActivo === 'CENTRO' ? 'Cargar certificado del centro' : `Cargar certificado — ${etiquetaTipo}`;
+  document.getElementById('input-activo-resumen').value =
+    tipoActivo === 'CENTRO' ? `${centroActual} (Centro de Trabajo)` : `${nombreActivo} — ${etiquetaTipo} de ${centroActual}`;
+
   document.getElementById('archivo-nombre').textContent = '';
   document.getElementById('modal-cargar').hidden = false;
 }
@@ -240,7 +286,7 @@ async function onSubmitCargar(e) {
   const archivoInput = document.getElementById('input-archivo');
   const archivo = archivoInput.files[0];
 
-  if (!activoActual.tipo || !activoActual.nombre) return mostrarErrorForm('Debe seleccionar un activo primero.');
+  if (!centroActual || !contextoModal.tipoActivo) return mostrarErrorForm('Falta seleccionar un activo.');
   if (!archivo) return mostrarErrorForm('Debe seleccionar un archivo.');
   if (archivo.type !== 'application/pdf') return mostrarErrorForm('El archivo debe ser un PDF.');
   if (!fechaCert) return mostrarErrorForm('Debe indicar la fecha de certificación.');
@@ -254,8 +300,9 @@ async function onSubmitCargar(e) {
     mostrarCargando('Subiendo certificado…');
 
     await apiPost('subirCertificado', {
-      tipoActivo: activoActual.tipo,
-      nombreActivo: activoActual.nombre,
+      centro: centroActual,
+      tipoActivo: contextoModal.tipoActivo,
+      nombreActivo: contextoModal.nombreActivo,
       fechaCertificacion: fechaCert,
       fechaVencimiento: fechaVenc,
       empresaCertificadora: empresa,
@@ -266,8 +313,8 @@ async function onSubmitCargar(e) {
     });
 
     cerrarModal();
-    mostrarToast('Certificado cargado correctamente. El anterior fue reemplazado.', 'success');
-    seleccionarActivo(activoActual.tipo, activoActual.nombre);
+    mostrarToast('Certificado cargado correctamente. El anterior (si existía) fue reemplazado.', 'success');
+    seleccionarCentro(centroActual);
     cargarDashboard();
   } catch (err) {
     mostrarErrorForm(err.message || 'Ocurrió un error al guardar el certificado.');
@@ -310,4 +357,10 @@ function mostrarToast(mensaje, tipo) {
   toast.textContent = mensaje;
   cont.appendChild(toast);
   setTimeout(() => toast.remove(), 4500);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
