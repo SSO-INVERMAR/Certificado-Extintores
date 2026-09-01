@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reservorio de Certificados de Extintores — Invermar</title>
 <style>
-  /* =========================================================
-     TOKENS DE MARCA — Invermar
-     Azul profundo PANTONE 281C #00205B / Dorado PANTONE 16-0836 TCX #C8B273
-     ========================================================= */
   :root {
     --color-primary: #00205B;
     --color-primary-dark: #001640;
@@ -39,12 +35,7 @@
   h1, h2, h3 { margin: 0; }
   button { font-family: inherit; cursor: pointer; }
 
-  .app-header {
-    background: var(--color-primary);
-    color: #fff;
-    padding: 18px 20px;
-    border-bottom: 3px solid var(--color-accent);
-  }
+  .app-header { background: var(--color-primary); color: #fff; padding: 18px 20px; border-bottom: 3px solid var(--color-accent); }
   .header-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .brand-logo { height: 40px; width: auto; filter: brightness(0) invert(1); }
   .brand-text h1 { font-size: 1.25rem; font-weight: 700; }
@@ -52,76 +43,39 @@
 
   .app-main { max-width: 1000px; margin: 0 auto; padding: 28px 20px 64px; }
 
-  /* ---------- Pantalla de inicio: 2 opciones grandes ---------- */
-  .home-opciones {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-top: 8px;
+  /* ---------- Botones grandes de opción (home y elegir tipo) ---------- */
+  .opciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+  .opciones-grid.tres { grid-template-columns: 1fr 1fr 1fr; }
+  .opcion-grande {
+    background: var(--color-surface); border: 2px solid var(--color-border); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); padding: 28px 20px; text-align: center; font-size: 1.1rem; font-weight: 700;
+    color: var(--color-primary); display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
-  .home-opcion {
-    background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    padding: 32px 24px;
-    text-align: center;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .home-opcion:hover { border-color: var(--color-accent); background: #FBF9F3; }
-  .home-opcion .icono { font-size: 2rem; }
+  .opcion-grande:hover { border-color: var(--color-accent); background: #FBF9F3; }
+  .opcion-grande .icono { font-size: 1.8rem; }
 
   .btn-volver {
-    background: none;
-    border: none;
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0;
-    margin-bottom: 18px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    background: none; border: none; color: var(--color-primary); font-weight: 600; font-size: 0.9rem;
+    padding: 0; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 6px;
   }
   .btn-volver:hover { text-decoration: underline; }
 
-  /* ---------- Dashboard ---------- */
-  .dashboard-grupos { display: flex; flex-direction: column; gap: 16px; margin-bottom: 26px; }
-  .dashboard-grupo-titulo { font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.4px; color: var(--color-ink-soft); margin: 0 0 8px; }
-  .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .stat-card { background: var(--color-surface); border: 1px solid var(--color-border);
-    border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column;
-    gap: 4px; box-shadow: var(--shadow-card); border-top: 3px solid var(--color-primary); }
-  .stat-value { font-size: 1.4rem; font-weight: 700; }
-  .stat-label { font-size: 0.72rem; color: var(--color-ink-soft); text-transform: uppercase; letter-spacing: 0.3px; }
-  .stat-vigente { border-top-color: var(--color-vigente); }
-  .stat-proximo { border-top-color: var(--color-proximo); }
-  .stat-vencido { border-top-color: var(--color-vencido); }
-
-  /* ---------- Selector de centro ---------- */
+  /* ---------- Selector ---------- */
   .selector-section { margin-bottom: 22px; }
   .selector-label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 8px; }
-  .selector-centro, .campo-input, .campo-select {
+  .campo-select, .campo-input {
     width: 100%; max-width: 480px; padding: 11px 12px; font-size: 0.95rem;
     border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-ink);
   }
-  .selector-centro { appearance: none;
+  .campo-select { appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5157' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
     background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 36px; }
 
-  /* ---------- Tarjetas de resultado ---------- */
+  /* ---------- Tarjeta de resultado ---------- */
   .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius);
     box-shadow: var(--shadow-card); padding: 20px; margin-bottom: 18px; }
   .tipo-activo-label { display: block; font-size: 0.76rem; font-weight: 700; color: var(--color-primary);
     text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
-  .card h2, .card h3 { margin-bottom: 6px; }
 
   .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700;
     letter-spacing: 0.3px; padding: 5px 12px; border-radius: 999px; text-transform: uppercase; }
@@ -139,35 +93,22 @@
   .btn-primary:hover { background: var(--color-primary-dark); }
   .btn-primary:disabled { background: var(--color-sin); cursor: not-allowed; }
 
-  .lista-activos { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-  .lista-vacia { color: var(--color-ink-soft); font-size: 0.86rem; margin: 8px 0 0; }
-  .activo-item { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
-  .activo-item-nombre { font-weight: 700; font-size: 0.92rem; margin-right: 8px; }
-  .activo-item-detalle { font-size: 0.78rem; color: var(--color-ink-soft); margin-left: 8px; }
-
   /* ---------- Formulario de carga ---------- */
   .form-carga { display: flex; flex-direction: column; gap: 16px; max-width: 520px; }
   .campo { display: flex; flex-direction: column; gap: 6px; }
   .campo label { font-size: 0.85rem; font-weight: 600; }
   .campo .opcional { font-weight: 400; color: var(--color-ink-soft); }
-  .aviso { background: #FBF6EA; color: #8A6A1F; border: 1px solid #EEDFB8; padding: 10px 12px;
-    border-radius: 8px; font-size: 0.82rem; }
-  .form-error { background: var(--color-vencido-bg); color: var(--color-vencido); padding: 10px 12px;
-    border-radius: 8px; font-size: 0.85rem; }
-  .form-exito { background: var(--color-vigente-bg); color: var(--color-vigente); padding: 14px 16px;
-    border-radius: 8px; font-size: 0.92rem; margin-bottom: 16px; }
+  .aviso { background: #FBF6EA; color: #8A6A1F; border: 1px solid #EEDFB8; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; }
+  .form-error { background: var(--color-vencido-bg); color: var(--color-vencido); padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; }
+  .form-exito { background: var(--color-vigente-bg); color: var(--color-vigente); padding: 14px 16px; border-radius: 8px; font-size: 0.92rem; margin-bottom: 16px; }
 
-  /* ---------- Toasts / loading ---------- */
   .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1100; }
-  .toast { background: var(--color-ink); color: #fff; padding: 13px 18px; border-radius: 8px; font-size: 0.88rem;
-    box-shadow: var(--shadow-card); max-width: 320px; }
+  .toast { background: var(--color-ink); color: #fff; padding: 13px 18px; border-radius: 8px; font-size: 0.88rem; box-shadow: var(--shadow-card); max-width: 320px; }
   .toast-success { background: var(--color-vigente); }
   .toast-error { background: var(--color-vencido); }
 
-  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex;
-    flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 1200; }
-  .loading-overlay[hidden] { display: none; }
+  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px; z-index: 1200; }
   .spinner { width: 40px; height: 40px; border: 4px solid var(--color-border); border-top-color: var(--color-primary);
     border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -176,8 +117,7 @@
   [hidden] { display: none !important; }
 
   @media (max-width: 700px) {
-    .home-opciones { grid-template-columns: 1fr; }
-    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .opciones-grid, .opciones-grid.tres { grid-template-columns: 1fr; }
     .info-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
@@ -189,7 +129,7 @@
       <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo">
       <div class="brand-text">
         <h1>Reservorio de Certificados de Extintores</h1>
-        <p>Plataforma para consulta y gestión de certificados de extintores por centro de trabajo, sus botes y artefactos navales.</p>
+        <p>Plataforma para consulta y gestión de certificados de extintores de Centros de Trabajo, Botes y Artefactos Navales.</p>
       </div>
     </div>
   </header>
@@ -198,64 +138,65 @@
 
     <!-- ===================== VISTA: INICIO ===================== -->
     <section id="view-home">
-      <div class="home-opciones">
-        <button type="button" class="home-opcion" id="btn-ir-consultar">
+      <div class="opciones-grid">
+        <button type="button" class="opcion-grande" id="btn-ir-consultar">
           <span class="icono">🔍</span>
           CONSULTAR CERTIFICADOS
         </button>
-        <button type="button" class="home-opcion" id="btn-ir-cargar">
+        <button type="button" class="opcion-grande" id="btn-ir-cargar">
           <span class="icono">⬆️</span>
           CARGAR NUEVO CERTIFICADO
         </button>
       </div>
     </section>
 
-    <!-- ===================== VISTA: CONSULTAR ===================== -->
-    <section id="view-consultar" hidden>
-      <button type="button" class="btn-volver" data-volver>← Volver al inicio</button>
+    <!-- ===================== VISTA: ELEGIR TIPO A CONSULTAR ===================== -->
+    <section id="view-consultar-tipo" hidden>
+      <button type="button" class="btn-volver" data-volver-home>← Volver al inicio</button>
+      <h2 style="margin-bottom:16px;">¿Qué quieres consultar?</h2>
+      <div class="opciones-grid tres">
+        <button type="button" class="opcion-grande" data-tipo="CENTRO">
+          <span class="icono">🏭</span> Centro
+        </button>
+        <button type="button" class="opcion-grande" data-tipo="ARTEFACTO_NAVAL">
+          <span class="icono">⚓</span> Artefacto Naval
+        </button>
+        <button type="button" class="opcion-grande" data-tipo="BOTE">
+          <span class="icono">🚤</span> Bote
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== VISTA: RESULTADO DE CONSULTA ===================== -->
+    <section id="view-consultar-resultado" hidden>
+      <button type="button" class="btn-volver" data-volver-tipo>← Elegir otro tipo</button>
 
       <section class="selector-section">
-        <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
-        <select id="selector-centro" class="selector-centro">
-          <option value="" selected disabled>Seleccionar centro de trabajo…</option>
+        <label for="selector-nombre-consulta" class="selector-label" id="label-selector-consulta">Seleccione</label>
+        <select id="selector-nombre-consulta" class="campo-select">
+          <option value="" selected disabled>Seleccionar…</option>
         </select>
       </section>
 
       <section id="resultado-consulta" hidden>
-
         <div class="card">
-          <span class="tipo-activo-label">Certificado del centro de trabajo</span>
-          <h2 id="centro-nombre">—</h2>
-          <span id="centro-badge" class="badge">—</span>
+          <span class="tipo-activo-label" id="resultado-tipo-label">—</span>
+          <h2 id="resultado-nombre">—</h2>
+          <span id="resultado-badge" class="badge">—</span>
           <dl class="info-grid">
-            <div><dt>Fecha certificación</dt><dd id="centro-fecha-cert">—</dd></div>
-            <div><dt>Fecha vencimiento</dt><dd id="centro-fecha-venc">—</dd></div>
-            <div><dt>Días restantes</dt><dd id="centro-dias">—</dd></div>
-            <div><dt>Empresa certificadora</dt><dd id="centro-empresa">—</dd></div>
+            <div><dt>Fecha certificación</dt><dd id="resultado-fecha-cert">—</dd></div>
+            <div><dt>Fecha vencimiento</dt><dd id="resultado-fecha-venc">—</dd></div>
+            <div><dt>Días restantes</dt><dd id="resultado-dias">—</dd></div>
+            <div><dt>Empresa certificadora</dt><dd id="resultado-empresa">—</dd></div>
           </dl>
-          <button id="btn-descargar-centro" class="btn btn-primary" type="button" style="margin-top:10px;">📄 Descargar certificado</button>
+          <button id="btn-descargar-resultado" class="btn btn-primary" type="button" style="margin-top:10px;">📄 Descargar certificado</button>
         </div>
-
-        <div class="card">
-          <h3>Botes de este centro</h3>
-          <div id="lista-botes" class="lista-activos">
-            <p class="lista-vacia">Este centro no tiene botes con certificado registrado.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Artefactos navales de este centro</h3>
-          <div id="lista-artefactos" class="lista-activos">
-            <p class="lista-vacia">Este centro no tiene artefactos navales con certificado registrado.</p>
-          </div>
-        </div>
-
       </section>
     </section>
 
     <!-- ===================== VISTA: CARGAR ===================== -->
     <section id="view-cargar" hidden>
-      <button type="button" class="btn-volver" data-volver>← Volver al inicio</button>
+      <button type="button" class="btn-volver" data-volver-home>← Volver al inicio</button>
       <h2 style="margin-bottom:16px;">Cargar nuevo certificado</h2>
 
       <p id="carga-exito" class="form-exito" hidden></p>
@@ -264,24 +205,20 @@
         <p class="aviso">Al guardar, se reemplazará automáticamente el certificado anterior de este activo (si existía).</p>
 
         <div class="campo">
-          <label for="input-centro">Centro de trabajo</label>
-          <select id="input-centro" class="campo-select" required>
-            <option value="" selected disabled>Seleccionar centro de trabajo…</option>
+          <label for="input-tipo">Tipo de certificado</label>
+          <select id="input-tipo" class="campo-select" required>
+            <option value="" selected disabled>Seleccionar tipo…</option>
+            <option value="CENTRO">Centro</option>
+            <option value="ARTEFACTO_NAVAL">Artefacto Naval</option>
+            <option value="BOTE">Bote</option>
           </select>
         </div>
 
         <div class="campo">
-          <label for="input-tipo">Tipo de certificado</label>
-          <select id="input-tipo" class="campo-select" required>
-            <option value="CENTRO">Centro de Trabajo</option>
-            <option value="BOTE">Bote</option>
-            <option value="ARTEFACTO_NAVAL">Artefacto Naval</option>
+          <label for="input-nombre-activo">Nombre</label>
+          <select id="input-nombre-activo" class="campo-select" required disabled>
+            <option value="" selected disabled>Primero elige el tipo…</option>
           </select>
-        </div>
-
-        <div class="campo" id="campo-nombre-activo" hidden>
-          <label for="input-nombre-activo">Nombre o código del bote / artefacto naval</label>
-          <input type="text" id="input-nombre-activo" class="campo-input" placeholder="Ej: Delfín II">
         </div>
 
         <div class="campo">
@@ -334,10 +271,26 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbwxbfkN9wStcq2ve3lTKyKMFfhgEeRoTMdOl0uh4xwRyfHVi8tQbDsHn29Hszp9NjN1/exec';
 
   // ============================================================
-  // ESTADO
+  // LISTAS FIJAS
   // ============================================================
-  let centroConsultaActual = null;
-  let claveCargaIngresada = null;
+  const ARTEFACTOS_NAVALES = [
+    'Australis III', 'Australis V', 'Australis VII', 'Australis VIII',
+    'Invermar V', 'Invermar VII', 'Pelagos II'
+  ];
+
+  const BOTES = [
+    'Don Giglio', 'Black', 'Chalihue IV', 'Chulin', 'Chulin I', 'Contento', 'Cuervo',
+    'Devia', 'Don Topo', 'Errante II', 'Ester', 'Estuar', 'Fe Grande', 'Gales 1',
+    'Inzek', 'Isla Lemuy', 'Jason', 'Kisutch', 'Lile', 'Llingua I', 'Locky I',
+    'Martin Pescador', 'Martina', 'Merlin', 'Motivado', 'Nayahue', 'Nayahue I',
+    'Pampino', 'Puqueldon I', 'Quetro', 'Segundo I', 'Shuller', 'Skiring', 'Tepun I',
+    'Trukur', 'Valentina', 'Volcan I', 'Walker', 'Walker I', 'Walker II',
+    'Willian Wallace', 'Wilson'
+  ];
+
+  let CENTROS = []; // se llena desde la API al cargar la página
+
+  const TIPO_LABEL = { CENTRO: 'Centro', ARTEFACTO_NAVAL: 'Artefacto Naval', BOTE: 'Bote' };
 
   const ESTADO_META = {
     VIGENTE:          { texto: '🟢 Vigente',           badge: 'badge-vigente' },
@@ -345,6 +298,9 @@
     VENCIDO:          { texto: '🔴 Vencido',           badge: 'badge-vencido' },
     SIN_CERTIFICADO:  { texto: '⚪ Sin certificado',   badge: 'badge-sin' }
   };
+
+  let tipoConsultaActual = null;
+  let claveCargaIngresada = null;
 
   // ============================================================
   // API
@@ -371,51 +327,54 @@
   }
 
   // ============================================================
-  // NAVEGACIÓN ENTRE VISTAS
+  // NAVEGACIÓN
   // ============================================================
   function mostrarVista(id) {
-    ['view-home', 'view-consultar', 'view-cargar'].forEach(v => {
+    ['view-home', 'view-consultar-tipo', 'view-consultar-resultado', 'view-cargar'].forEach(v => {
       document.getElementById(v).hidden = (v !== id);
     });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    cargarListaCentros();
+    cargarCentros();
     configurarEventos();
   });
 
   function configurarEventos() {
     document.getElementById('btn-ir-consultar').addEventListener('click', () => {
-      mostrarVista('view-consultar');
-      document.getElementById('selector-centro').value = '';
-      document.getElementById('resultado-consulta').hidden = true;
+      mostrarVista('view-consultar-tipo');
     });
     document.getElementById('btn-ir-cargar').addEventListener('click', () => {
       const clave = prompt('Ingresa la clave para cargar certificados:');
-      if (!clave) return; // canceló o dejó vacío, no navega
+      if (!clave) return;
       claveCargaIngresada = clave;
       mostrarVista('view-cargar');
     });
-    document.querySelectorAll('[data-volver]').forEach(btn => {
+    document.querySelectorAll('[data-volver-home]').forEach(btn => {
       btn.addEventListener('click', () => {
         claveCargaIngresada = null;
         mostrarVista('view-home');
       });
     });
-
-    document.getElementById('selector-centro').addEventListener('change', (e) => {
-      if (e.target.value) seleccionarCentroConsulta(e.target.value);
+    document.querySelector('[data-volver-tipo]').addEventListener('click', () => {
+      mostrarVista('view-consultar-tipo');
     });
 
-    document.getElementById('btn-descargar-centro').addEventListener('click', () => {
-      const url = document.getElementById('btn-descargar-centro').dataset.url;
-      if (!url) return mostrarToast('Este centro no posee un certificado vigente.', 'error');
+    document.querySelectorAll('#view-consultar-tipo [data-tipo]').forEach(btn => {
+      btn.addEventListener('click', () => abrirConsultaPorTipo(btn.dataset.tipo));
+    });
+
+    document.getElementById('selector-nombre-consulta').addEventListener('change', (e) => {
+      if (e.target.value) consultarActivo(tipoConsultaActual, e.target.value);
+    });
+
+    document.getElementById('btn-descargar-resultado').addEventListener('click', () => {
+      const url = document.getElementById('btn-descargar-resultado').dataset.url;
+      if (!url) return mostrarToast('Este activo no posee un certificado vigente.', 'error');
       window.open(url, '_blank');
     });
 
-    document.getElementById('input-tipo').addEventListener('change', (e) => {
-      document.getElementById('campo-nombre-activo').hidden = (e.target.value === 'CENTRO');
-    });
+    document.getElementById('input-tipo').addEventListener('change', (e) => onCambiarTipoCarga(e.target.value));
 
     document.getElementById('input-archivo').addEventListener('change', (e) => {
       const archivo = e.target.files[0];
@@ -425,116 +384,84 @@
     document.getElementById('form-cargar').addEventListener('submit', onSubmitCargar);
   }
 
-  // ============================================================
-  // CARGA DE LISTA DE CENTROS (para ambos selects: consultar y cargar)
-  // ============================================================
-  async function cargarListaCentros() {
+  async function cargarCentros() {
     try {
       const centros = await apiGet('centros');
-      const selectConsultar = document.getElementById('selector-centro');
-      const selectCargar = document.getElementById('input-centro');
-      centros.forEach(c => {
-        const opt1 = document.createElement('option');
-        opt1.value = c.nombre; opt1.textContent = c.nombre;
-        selectConsultar.appendChild(opt1);
-
-        const opt2 = document.createElement('option');
-        opt2.value = c.nombre; opt2.textContent = c.nombre;
-        selectCargar.appendChild(opt2);
-      });
+      CENTROS = centros.map(c => c.nombre);
     } catch (err) {
       mostrarToast('No se pudo cargar la lista de centros. Recargue la página.', 'error');
     }
   }
 
   // ============================================================
-  // VISTA CONSULTAR
+  // VISTA: CONSULTAR
   // ============================================================
-  async function cargarDashboard() {
-    try {
-      const stats = await apiGet('dashboard');
-      pintarGrupoDashboard('centro', stats.centros);
-      pintarGrupoDashboard('bote', stats.botes);
-      pintarGrupoDashboard('artefacto', stats.artefactosNavales);
-    } catch (err) { /* el dashboard es informativo, no bloquea el resto */ }
+  function listaParaTipo(tipo) {
+    if (tipo === 'CENTRO') return CENTROS;
+    if (tipo === 'ARTEFACTO_NAVAL') return ARTEFACTOS_NAVALES;
+    if (tipo === 'BOTE') return BOTES;
+    return [];
   }
 
-  function pintarGrupoDashboard(prefijo, stats) {
-    document.getElementById(`stat-${prefijo}-total`).textContent = stats.total;
-    document.getElementById(`stat-${prefijo}-vigentes`).textContent = stats.vigentes;
-    document.getElementById(`stat-${prefijo}-proximos`).textContent = stats.proximosAVencer;
-    document.getElementById(`stat-${prefijo}-vencidos`).textContent = stats.vencidos;
+  function abrirConsultaPorTipo(tipo) {
+    tipoConsultaActual = tipo;
+    document.getElementById('resultado-consulta').hidden = true;
+
+    const label = document.getElementById('label-selector-consulta');
+    label.textContent = tipo === 'CENTRO' ? 'Seleccione centro de trabajo'
+      : tipo === 'ARTEFACTO_NAVAL' ? 'Seleccione artefacto naval'
+      : 'Seleccione bote';
+
+    const select = document.getElementById('selector-nombre-consulta');
+    select.innerHTML = '<option value="" selected disabled>Seleccionar…</option>';
+    listaParaTipo(tipo).forEach(nombre => {
+      const opt = document.createElement('option');
+      opt.value = nombre; opt.textContent = nombre;
+      select.appendChild(opt);
+    });
+
+    mostrarVista('view-consultar-resultado');
   }
 
-  async function seleccionarCentroConsulta(centro) {
-    centroConsultaActual = centro;
-    mostrarCargando('Consultando centro…');
+  async function consultarActivo(tipo, nombre) {
+    mostrarCargando('Consultando…');
     try {
-      const info = await apiGet('infoCentroCompleto', { centro });
-      renderResultadoConsulta(info);
+      const info = await apiGet('infoActivo', { tipo, nombre });
+      renderResultado(tipo, nombre, info);
       document.getElementById('resultado-consulta').hidden = false;
     } catch (err) {
-      mostrarToast('Error al consultar el centro: ' + err.message, 'error');
+      mostrarToast('Error al consultar: ' + err.message, 'error');
     } finally {
       ocultarCargando();
     }
   }
 
-  function renderResultadoConsulta(info) {
-    document.getElementById('centro-nombre').textContent = info.centro;
+  function renderResultado(tipo, nombre, info) {
+    document.getElementById('resultado-tipo-label').textContent = TIPO_LABEL[tipo] || tipo;
+    document.getElementById('resultado-nombre').textContent = nombre;
 
-    const meta = ESTADO_META[info.estadoCentro] || ESTADO_META.SIN_CERTIFICADO;
-    const badge = document.getElementById('centro-badge');
+    const meta = ESTADO_META[info.estado] || ESTADO_META.SIN_CERTIFICADO;
+    const badge = document.getElementById('resultado-badge');
     badge.textContent = meta.texto;
     badge.className = 'badge ' + meta.badge;
 
-    const cert = info.certificadoCentro;
-    const btnDescargar = document.getElementById('btn-descargar-centro');
-    if (cert && info.estadoCentro !== 'SIN_CERTIFICADO') {
-      document.getElementById('centro-fecha-cert').textContent = cert.fechaCertificacion || '—';
-      document.getElementById('centro-fecha-venc').textContent = cert.fechaVencimiento || '—';
-      document.getElementById('centro-dias').textContent = formatearDias(cert.diasRestantes);
-      document.getElementById('centro-empresa').textContent = cert.empresaCertificadora || '—';
+    const cert = info.certificado;
+    const btnDescargar = document.getElementById('btn-descargar-resultado');
+    if (cert && info.estado !== 'SIN_CERTIFICADO') {
+      document.getElementById('resultado-fecha-cert').textContent = cert.fechaCertificacion || '—';
+      document.getElementById('resultado-fecha-venc').textContent = cert.fechaVencimiento || '—';
+      document.getElementById('resultado-dias').textContent = formatearDias(cert.diasRestantes);
+      document.getElementById('resultado-empresa').textContent = cert.empresaCertificadora || '—';
       btnDescargar.disabled = false;
       btnDescargar.dataset.url = cert.urlArchivo || '';
     } else {
-      document.getElementById('centro-fecha-cert').textContent = '—';
-      document.getElementById('centro-fecha-venc').textContent = '—';
-      document.getElementById('centro-dias').textContent = '—';
-      document.getElementById('centro-empresa').textContent = '—';
+      document.getElementById('resultado-fecha-cert').textContent = '—';
+      document.getElementById('resultado-fecha-venc').textContent = '—';
+      document.getElementById('resultado-dias').textContent = '—';
+      document.getElementById('resultado-empresa').textContent = '—';
       btnDescargar.disabled = true;
       btnDescargar.dataset.url = '';
     }
-
-    renderListaActivos('lista-botes', info.botes, 'botes');
-    renderListaActivos('lista-artefactos', info.artefactosNavales, 'artefactos navales');
-  }
-
-  function renderListaActivos(contenedorId, items, etiquetaVacio) {
-    const cont = document.getElementById(contenedorId);
-    cont.innerHTML = '';
-    if (!items || items.length === 0) {
-      cont.innerHTML = `<p class="lista-vacia">Este centro no tiene ${etiquetaVacio} con certificado registrado.</p>`;
-      return;
-    }
-    items.forEach(item => {
-      const meta = ESTADO_META[item.estado] || ESTADO_META.SIN_CERTIFICADO;
-      const cert = item.certificado;
-      const row = document.createElement('div');
-      row.className = 'activo-item';
-      row.innerHTML = `
-        <div>
-          <span class="activo-item-nombre">${escapeHtml(item.nombre)}</span>
-          <span class="badge ${meta.badge}">${meta.texto}</span>
-          ${cert ? `<span class="activo-item-detalle">Vence: ${escapeHtml(cert.fechaVencimiento || '—')}</span>` : ''}
-        </div>
-        <button type="button" class="btn btn-primary btn-descargar-item" ${cert && cert.urlArchivo ? '' : 'disabled'}>Descargar</button>
-      `;
-      if (cert && cert.urlArchivo) {
-        row.querySelector('.btn-descargar-item').addEventListener('click', () => window.open(cert.urlArchivo, '_blank'));
-      }
-      cont.appendChild(row);
-    });
   }
 
   function formatearDias(dias) {
@@ -545,8 +472,26 @@
   }
 
   // ============================================================
-  // VISTA CARGAR
+  // VISTA: CARGAR
   // ============================================================
+  function onCambiarTipoCarga(tipo) {
+    const select = document.getElementById('input-nombre-activo');
+    select.innerHTML = '';
+    select.disabled = !tipo;
+
+    if (!tipo) {
+      select.innerHTML = '<option value="" selected disabled>Primero elige el tipo…</option>';
+      return;
+    }
+
+    select.innerHTML = '<option value="" selected disabled>Seleccionar…</option>';
+    listaParaTipo(tipo).forEach(nombre => {
+      const opt = document.createElement('option');
+      opt.value = nombre; opt.textContent = nombre;
+      select.appendChild(opt);
+    });
+  }
+
   async function onSubmitCargar(e) {
     e.preventDefault();
 
@@ -554,17 +499,16 @@
     errorEl.hidden = true;
     document.getElementById('carga-exito').hidden = true;
 
-    const centro = document.getElementById('input-centro').value;
     const tipoActivo = document.getElementById('input-tipo').value;
-    const nombreActivo = document.getElementById('input-nombre-activo').value.trim();
+    const nombreActivo = document.getElementById('input-nombre-activo').value;
     const fechaCert = document.getElementById('input-fecha-cert').value;
     const fechaVenc = document.getElementById('input-fecha-venc').value;
     const empresa = document.getElementById('input-empresa').value.trim();
     const nroCert = document.getElementById('input-nro-cert').value.trim();
     const archivo = document.getElementById('input-archivo').files[0];
 
-    if (!centro) return mostrarErrorForm('Debe seleccionar el centro de trabajo.');
-    if (tipoActivo !== 'CENTRO' && !nombreActivo) return mostrarErrorForm('Debe indicar el nombre del bote o artefacto naval.');
+    if (!tipoActivo) return mostrarErrorForm('Debe seleccionar el tipo de certificado.');
+    if (!nombreActivo) return mostrarErrorForm('Debe seleccionar el nombre del activo.');
     if (!archivo) return mostrarErrorForm('Debe seleccionar un archivo.');
     if (archivo.type !== 'application/pdf') return mostrarErrorForm('El archivo debe ser un PDF.');
     if (!fechaCert) return mostrarErrorForm('Debe indicar la fecha de certificación.');
@@ -578,7 +522,7 @@
       mostrarCargando('Subiendo certificado…');
 
       await apiPost('subirCertificado', {
-        centro, tipoActivo, nombreActivo,
+        tipoActivo, nombreActivo,
         fechaCertificacion: fechaCert,
         fechaVencimiento: fechaVenc,
         empresaCertificadora: empresa,
@@ -590,7 +534,8 @@
       });
 
       document.getElementById('form-cargar').reset();
-      document.getElementById('campo-nombre-activo').hidden = true;
+      document.getElementById('input-nombre-activo').innerHTML = '<option value="" selected disabled>Primero elige el tipo…</option>';
+      document.getElementById('input-nombre-activo').disabled = true;
       document.getElementById('archivo-nombre').textContent = '';
       const exito = document.getElementById('carga-exito');
       exito.textContent = 'Certificado cargado correctamente. El anterior de este activo (si existía) fue reemplazado.';
@@ -635,11 +580,6 @@
     toast.textContent = mensaje;
     cont.appendChild(toast);
     setTimeout(() => toast.remove(), 4500);
-  }
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
   }
 </script>
 </body>
