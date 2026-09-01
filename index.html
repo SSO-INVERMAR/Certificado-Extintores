@@ -337,6 +337,7 @@
   // ESTADO
   // ============================================================
   let centroConsultaActual = null;
+  let claveCargaIngresada = null;
 
   const ESTADO_META = {
     VIGENTE:          { texto: '🟢 Vigente',           badge: 'badge-vigente' },
@@ -390,10 +391,16 @@
       document.getElementById('resultado-consulta').hidden = true;
     });
     document.getElementById('btn-ir-cargar').addEventListener('click', () => {
+      const clave = prompt('Ingresa la clave para cargar certificados:');
+      if (!clave) return; // canceló o dejó vacío, no navega
+      claveCargaIngresada = clave;
       mostrarVista('view-cargar');
     });
     document.querySelectorAll('[data-volver]').forEach(btn => {
-      btn.addEventListener('click', () => mostrarVista('view-home'));
+      btn.addEventListener('click', () => {
+        claveCargaIngresada = null;
+        mostrarVista('view-home');
+      });
     });
 
     document.getElementById('selector-centro').addEventListener('change', (e) => {
@@ -578,7 +585,8 @@
         nroCertificado: nroCert,
         archivoBase64: base64,
         nombreArchivo: archivo.name,
-        mimeType: archivo.type
+        mimeType: archivo.type,
+        clave: claveCargaIngresada
       });
 
       document.getElementById('form-cargar').reset();
