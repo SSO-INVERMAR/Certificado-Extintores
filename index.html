@@ -214,36 +214,6 @@
     <section id="view-consultar" hidden>
       <button type="button" class="btn-volver" data-volver>← Volver al inicio</button>
 
-      <section class="dashboard-grupos" aria-label="Resumen general">
-        <div>
-          <p class="dashboard-grupo-titulo">Centros de trabajo</p>
-          <div class="dashboard">
-            <div class="stat-card"><span class="stat-value" id="stat-centro-total">–</span><span class="stat-label">Total</span></div>
-            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-centro-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-centro-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-centro-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="dashboard-grupo-titulo">Botes (todos los centros)</p>
-          <div class="dashboard">
-            <div class="stat-card"><span class="stat-value" id="stat-bote-total">–</span><span class="stat-label">Con certificado</span></div>
-            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-bote-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-bote-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-bote-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="dashboard-grupo-titulo">Artefactos navales (todos los centros)</p>
-          <div class="dashboard">
-            <div class="stat-card"><span class="stat-value" id="stat-artefacto-total">–</span><span class="stat-label">Con certificado</span></div>
-            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-artefacto-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-artefacto-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-artefacto-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-          </div>
-        </div>
-      </section>
-
       <section class="selector-section">
         <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
         <select id="selector-centro" class="selector-centro">
@@ -417,8 +387,7 @@
     document.getElementById('btn-ir-consultar').addEventListener('click', () => {
       mostrarVista('view-consultar');
       document.getElementById('selector-centro').value = '';
-document.getElementById('resultado-consulta').hidden = true;
-      cargarDashboard();
+      document.getElementById('resultado-consulta').hidden = true;
     });
     document.getElementById('btn-ir-cargar').addEventListener('click', () => {
       mostrarVista('view-cargar');
