@@ -1,194 +1,667 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reservorio de Certificados de Extintores — Invermar</title>
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservorio de Certificados de Extintores — Invermar</title>
+<style>
+  /* =========================================================
+     TOKENS DE MARCA — Invermar
+     Azul profundo PANTONE 281C #00205B / Dorado PANTONE 16-0836 TCX #C8B273
+     ========================================================= */
+  :root {
+    --color-primary: #00205B;
+    --color-primary-dark: #001640;
+    --color-accent: #C8B273;
+    --color-ink: #1C2024;
+    --color-ink-soft: #4A5157;
+    --color-bg: #F2F3F5;
+    --color-surface: #FFFFFF;
+    --color-border: #E1E4E8;
+
+    --color-vigente: #1E7A4C;
+    --color-vigente-bg: #E7F4EC;
+    --color-proximo: #B9791A;
+    --color-proximo-bg: #FBF1DE;
+    --color-vencido: #B3221E;
+    --color-vencido-bg: #FBE9E8;
+    --color-sin: #6B7178;
+    --color-sin-bg: #EDECEA;
+
+    --font-display: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --radius: 10px;
+    --shadow-card: 0 1px 2px rgba(28,32,36,0.06), 0 4px 16px rgba(28,32,36,0.05);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--color-bg); color: var(--color-ink);
+    font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { margin: 0; }
+  button { font-family: inherit; cursor: pointer; }
+
+  .app-header {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 18px 20px;
+    border-bottom: 3px solid var(--color-accent);
+  }
+  .header-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .brand-logo { height: 40px; width: auto; filter: brightness(0) invert(1); }
+  .brand-text h1 { font-size: 1.25rem; font-weight: 700; }
+  .brand-text p { margin: 4px 0 0; font-size: 0.88rem; color: #C9D3E0; max-width: 640px; }
+
+  .app-main { max-width: 1000px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  /* ---------- Pantalla de inicio: 2 opciones grandes ---------- */
+  .home-opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .home-opcion {
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 32px 24px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .home-opcion:hover { border-color: var(--color-accent); background: #FBF9F3; }
+  .home-opcion .icono { font-size: 2rem; }
+
+  .btn-volver {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0;
+    margin-bottom: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-volver:hover { text-decoration: underline; }
+
+  /* ---------- Dashboard ---------- */
+  .dashboard-grupos { display: flex; flex-direction: column; gap: 16px; margin-bottom: 26px; }
+  .dashboard-grupo-titulo { font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.4px; color: var(--color-ink-soft); margin: 0 0 8px; }
+  .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat-card { background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column;
+    gap: 4px; box-shadow: var(--shadow-card); border-top: 3px solid var(--color-primary); }
+  .stat-value { font-size: 1.4rem; font-weight: 700; }
+  .stat-label { font-size: 0.72rem; color: var(--color-ink-soft); text-transform: uppercase; letter-spacing: 0.3px; }
+  .stat-vigente { border-top-color: var(--color-vigente); }
+  .stat-proximo { border-top-color: var(--color-proximo); }
+  .stat-vencido { border-top-color: var(--color-vencido); }
+
+  /* ---------- Selector de centro ---------- */
+  .selector-section { margin-bottom: 22px; }
+  .selector-label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 8px; }
+  .selector-centro, .campo-input, .campo-select {
+    width: 100%; max-width: 480px; padding: 11px 12px; font-size: 0.95rem;
+    border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-ink);
+  }
+  .selector-centro { appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5157' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 36px; }
+
+  /* ---------- Tarjetas de resultado ---------- */
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); padding: 20px; margin-bottom: 18px; }
+  .tipo-activo-label { display: block; font-size: 0.76rem; font-weight: 700; color: var(--color-primary);
+    text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .card h2, .card h3 { margin-bottom: 6px; }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700;
+    letter-spacing: 0.3px; padding: 5px 12px; border-radius: 999px; text-transform: uppercase; }
+  .badge-vigente { background: var(--color-vigente-bg); color: var(--color-vigente); }
+  .badge-proximo { background: var(--color-proximo-bg); color: var(--color-proximo); }
+  .badge-vencido { background: var(--color-vencido-bg); color: var(--color-vencido); }
+  .badge-sin { background: var(--color-sin-bg); color: var(--color-sin); }
+
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 14px 0 8px; }
+  .info-grid dt { font-size: 0.72rem; color: var(--color-ink-soft); text-transform: uppercase; margin-bottom: 3px; }
+  .info-grid dd { margin: 0; font-size: 0.96rem; font-weight: 600; }
+
+  .btn { border: none; border-radius: 8px; padding: 10px 18px; font-size: 0.88rem; font-weight: 600; }
+  .btn-primary { background: var(--color-primary); color: #fff; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .btn-primary:disabled { background: var(--color-sin); cursor: not-allowed; }
+
+  .lista-activos { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .lista-vacia { color: var(--color-ink-soft); font-size: 0.86rem; margin: 8px 0 0; }
+  .activo-item { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
+  .activo-item-nombre { font-weight: 700; font-size: 0.92rem; margin-right: 8px; }
+  .activo-item-detalle { font-size: 0.78rem; color: var(--color-ink-soft); margin-left: 8px; }
+
+  /* ---------- Formulario de carga ---------- */
+  .form-carga { display: flex; flex-direction: column; gap: 16px; max-width: 520px; }
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo label { font-size: 0.85rem; font-weight: 600; }
+  .campo .opcional { font-weight: 400; color: var(--color-ink-soft); }
+  .aviso { background: #FBF6EA; color: #8A6A1F; border: 1px solid #EEDFB8; padding: 10px 12px;
+    border-radius: 8px; font-size: 0.82rem; }
+  .form-error { background: var(--color-vencido-bg); color: var(--color-vencido); padding: 10px 12px;
+    border-radius: 8px; font-size: 0.85rem; }
+  .form-exito { background: var(--color-vigente-bg); color: var(--color-vigente); padding: 14px 16px;
+    border-radius: 8px; font-size: 0.92rem; margin-bottom: 16px; }
+
+  /* ---------- Toasts / loading ---------- */
+  .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1100; }
+  .toast { background: var(--color-ink); color: #fff; padding: 13px 18px; border-radius: 8px; font-size: 0.88rem;
+    box-shadow: var(--shadow-card); max-width: 320px; }
+  .toast-success { background: var(--color-vigente); }
+  .toast-error { background: var(--color-vencido); }
+
+  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex;
+    flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 1200; }
+  .loading-overlay[hidden] { display: none; }
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--color-border); border-top-color: var(--color-primary);
+    border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--color-ink-soft); font-size: 0.9rem; }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 700px) {
+    .home-opciones { grid-template-columns: 1fr; }
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
 <body>
 
-  <!-- ===================== HEADER ===================== -->
   <header class="app-header">
     <div class="header-inner">
-      <div class="brand">
-        <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo">
-        <div class="brand-text">
-          <h1>Reservorio de Certificados de Extintores</h1>
-          <p>Plataforma para consulta y gestión de certificados de extintores por centro de trabajo, sus botes y artefactos navales.</p>
-        </div>
+      <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo">
+      <div class="brand-text">
+        <h1>Reservorio de Certificados de Extintores</h1>
+        <p>Plataforma para consulta y gestión de certificados de extintores por centro de trabajo, sus botes y artefactos navales.</p>
       </div>
     </div>
   </header>
 
   <main class="app-main">
 
-    <!-- ===================== DASHBOARD ===================== -->
-    <section class="dashboard-grupos" aria-label="Resumen general">
-      <div>
-        <p class="dashboard-grupo-titulo">Centros de trabajo</p>
-        <div class="dashboard">
-          <div class="stat-card"><span class="stat-value" id="stat-centro-total">–</span><span class="stat-label">Total</span></div>
-          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-centro-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-centro-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-centro-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-        </div>
-      </div>
-      <div>
-        <p class="dashboard-grupo-titulo">Botes (todos los centros)</p>
-        <div class="dashboard">
-          <div class="stat-card"><span class="stat-value" id="stat-bote-total">–</span><span class="stat-label">Con certificado</span></div>
-          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-bote-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-bote-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-bote-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-        </div>
-      </div>
-      <div>
-        <p class="dashboard-grupo-titulo">Artefactos navales (todos los centros)</p>
-        <div class="dashboard">
-          <div class="stat-card"><span class="stat-value" id="stat-artefacto-total">–</span><span class="stat-label">Con certificado</span></div>
-          <div class="stat-card stat-vigente"><span class="stat-value" id="stat-artefacto-vigentes">–</span><span class="stat-label">Vigentes</span></div>
-          <div class="stat-card stat-proximo"><span class="stat-value" id="stat-artefacto-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
-          <div class="stat-card stat-vencido"><span class="stat-value" id="stat-artefacto-vencidos">–</span><span class="stat-label">Vencidos</span></div>
-        </div>
+    <!-- ===================== VISTA: INICIO ===================== -->
+    <section id="view-home">
+      <div class="home-opciones">
+        <button type="button" class="home-opcion" id="btn-ir-consultar">
+          <span class="icono">🔍</span>
+          CONSULTAR CERTIFICADOS
+        </button>
+        <button type="button" class="home-opcion" id="btn-ir-cargar">
+          <span class="icono">⬆️</span>
+          CARGAR NUEVO CERTIFICADO
+        </button>
       </div>
     </section>
 
-    <!-- ===================== SELECTOR DE CENTRO (único, principal) ===================== -->
-    <section class="selector-section">
-      <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
-      <select id="selector-centro" class="selector-centro">
-        <option value="" selected disabled>Seleccionar centro de trabajo…</option>
-      </select>
-    </section>
+    <!-- ===================== VISTA: CONSULTAR ===================== -->
+    <section id="view-consultar" hidden>
+      <button type="button" class="btn-volver" data-volver>← Volver al inicio</button>
 
-    <!-- ===================== ESTADO VACÍO ===================== -->
-    <section id="empty-state" class="empty-state">
-      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M12 2v4M8 6l1.5 3M16 6l-1.5 3M6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Z" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <p>Seleccione un centro de trabajo para ver su certificado, sus botes y sus artefactos navales.</p>
-    </section>
+      <section class="dashboard-grupos" aria-label="Resumen general">
+        <div>
+          <p class="dashboard-grupo-titulo">Centros de trabajo</p>
+          <div class="dashboard">
+            <div class="stat-card"><span class="stat-value" id="stat-centro-total">–</span><span class="stat-label">Total</span></div>
+            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-centro-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-centro-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-centro-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="dashboard-grupo-titulo">Botes (todos los centros)</p>
+          <div class="dashboard">
+            <div class="stat-card"><span class="stat-value" id="stat-bote-total">–</span><span class="stat-label">Con certificado</span></div>
+            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-bote-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-bote-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-bote-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="dashboard-grupo-titulo">Artefactos navales (todos los centros)</p>
+          <div class="dashboard">
+            <div class="stat-card"><span class="stat-value" id="stat-artefacto-total">–</span><span class="stat-label">Con certificado</span></div>
+            <div class="stat-card stat-vigente"><span class="stat-value" id="stat-artefacto-vigentes">–</span><span class="stat-label">Vigentes</span></div>
+            <div class="stat-card stat-proximo"><span class="stat-value" id="stat-artefacto-proximos">–</span><span class="stat-label">Próx. a vencer</span></div>
+            <div class="stat-card stat-vencido"><span class="stat-value" id="stat-artefacto-vencidos">–</span><span class="stat-label">Vencidos</span></div>
+          </div>
+        </div>
+      </section>
 
-    <!-- ===================== PANEL DEL CENTRO ===================== -->
-    <section id="centro-panel" class="centro-panel" hidden>
+      <section class="selector-section">
+        <label for="selector-centro" class="selector-label">Seleccione centro de trabajo</label>
+        <select id="selector-centro" class="selector-centro">
+          <option value="" selected disabled>Seleccionar centro de trabajo…</option>
+        </select>
+      </section>
 
-      <!-- Certificado propio del centro -->
-      <div class="card info-card">
-        <div class="info-card-top">
+      <section id="resultado-consulta" hidden>
+
+        <div class="card">
           <span class="tipo-activo-label">Certificado del centro de trabajo</span>
           <h2 id="centro-nombre">—</h2>
           <span id="centro-badge" class="badge">—</span>
+          <dl class="info-grid">
+            <div><dt>Fecha certificación</dt><dd id="centro-fecha-cert">—</dd></div>
+            <div><dt>Fecha vencimiento</dt><dd id="centro-fecha-venc">—</dd></div>
+            <div><dt>Días restantes</dt><dd id="centro-dias">—</dd></div>
+            <div><dt>Empresa certificadora</dt><dd id="centro-empresa">—</dd></div>
+          </dl>
+          <button id="btn-descargar-centro" class="btn btn-primary" type="button" style="margin-top:10px;">📄 Descargar certificado</button>
         </div>
 
-        <dl class="info-grid">
-          <div><dt>Fecha de certificación</dt><dd id="centro-fecha-cert">—</dd></div>
-          <div><dt>Fecha de vencimiento</dt><dd id="centro-fecha-venc">—</dd></div>
-          <div><dt>Días restantes</dt><dd id="centro-dias">—</dd></div>
-          <div><dt>Empresa certificadora</dt><dd id="centro-empresa">—</dd></div>
-        </dl>
-
-        <p id="centro-sin-certificado-msg" class="sin-certificado-msg" hidden>
-          Este centro de trabajo no posee un certificado vigente.
-        </p>
-
-        <div class="actions">
-          <button id="btn-descargar-centro" class="btn btn-primary" type="button">📄 Descargar certificado vigente</button>
-          <button id="btn-cargar-centro" class="btn btn-secondary" type="button">⬆️ Cargar / actualizar certificado del centro</button>
+        <div class="card">
+          <h3>Botes de este centro</h3>
+          <div id="lista-botes" class="lista-activos">
+            <p class="lista-vacia">Este centro no tiene botes con certificado registrado.</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Botes del centro -->
-      <div class="card lista-card">
-        <h3>Botes de este centro</h3>
-        <div id="lista-botes" class="lista-activos">
-          <p class="lista-vacia">Este centro no tiene botes con certificado registrado todavía.</p>
+        <div class="card">
+          <h3>Artefactos navales de este centro</h3>
+          <div id="lista-artefactos" class="lista-activos">
+            <p class="lista-vacia">Este centro no tiene artefactos navales con certificado registrado.</p>
+          </div>
         </div>
-        <div class="agregar-activo-fila">
-          <input type="text" id="input-nuevo-bote" class="selector-texto" placeholder="Nombre o código del nuevo bote">
-          <button type="button" id="btn-agregar-bote" class="btn-consultar">⬆️ Cargar certificado de bote</button>
-        </div>
-      </div>
 
-      <!-- Artefactos Navales del centro -->
-      <div class="card lista-card">
-        <h3>Artefactos navales de este centro</h3>
-        <div id="lista-artefactos" class="lista-activos">
-          <p class="lista-vacia">Este centro no tiene artefactos navales con certificado registrado todavía.</p>
-        </div>
-        <div class="agregar-activo-fila">
-          <input type="text" id="input-nuevo-artefacto" class="selector-texto" placeholder="Nombre o código del nuevo artefacto naval">
-          <button type="button" id="btn-agregar-artefacto" class="btn-consultar">⬆️ Cargar certificado de artefacto</button>
-        </div>
-      </div>
-
+      </section>
     </section>
-  </main>
 
-  <!-- ===================== MODAL: CARGAR CERTIFICADO ===================== -->
-  <div id="modal-cargar" class="modal-overlay" hidden>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
-      <div class="modal-header">
-        <h3 id="modal-titulo">Cargar certificado</h3>
-        <button id="modal-cerrar" class="modal-cerrar" type="button" aria-label="Cerrar">✕</button>
-      </div>
+    <!-- ===================== VISTA: CARGAR ===================== -->
+    <section id="view-cargar" hidden>
+      <button type="button" class="btn-volver" data-volver>← Volver al inicio</button>
+      <h2 style="margin-bottom:16px;">Cargar nuevo certificado</h2>
 
-      <form id="form-cargar" class="modal-body">
-        <p class="modal-aviso" id="modal-aviso-texto">
-          Al guardar, se reemplazará automáticamente el certificado anterior de este activo (si existía).
-        </p>
+      <p id="carga-exito" class="form-exito" hidden></p>
 
-        <div class="form-field">
-          <label for="input-activo-resumen">Activo</label>
-          <input type="text" id="input-activo-resumen" disabled>
+      <form id="form-cargar" class="form-carga">
+        <p class="aviso">Al guardar, se reemplazará automáticamente el certificado anterior de este activo (si existía).</p>
+
+        <div class="campo">
+          <label for="input-centro">Centro de trabajo</label>
+          <select id="input-centro" class="campo-select" required>
+            <option value="" selected disabled>Seleccionar centro de trabajo…</option>
+          </select>
         </div>
 
-        <div class="form-field">
+        <div class="campo">
+          <label for="input-tipo">Tipo de certificado</label>
+          <select id="input-tipo" class="campo-select" required>
+            <option value="CENTRO">Centro de Trabajo</option>
+            <option value="BOTE">Bote</option>
+            <option value="ARTEFACTO_NAVAL">Artefacto Naval</option>
+          </select>
+        </div>
+
+        <div class="campo" id="campo-nombre-activo" hidden>
+          <label for="input-nombre-activo">Nombre o código del bote / artefacto naval</label>
+          <input type="text" id="input-nombre-activo" class="campo-input" placeholder="Ej: Delfín II">
+        </div>
+
+        <div class="campo">
           <label for="input-fecha-cert">Fecha de certificación</label>
-          <input type="date" id="input-fecha-cert" required>
+          <input type="date" id="input-fecha-cert" class="campo-input" required>
         </div>
 
-        <div class="form-field">
+        <div class="campo">
           <label for="input-fecha-venc">Fecha de vencimiento</label>
-          <input type="date" id="input-fecha-venc" required>
+          <input type="date" id="input-fecha-venc" class="campo-input" required>
         </div>
 
-        <div class="form-field">
+        <div class="campo">
           <label for="input-empresa">Empresa certificadora <span class="opcional">(opcional)</span></label>
-          <input type="text" id="input-empresa" placeholder="Ej: Extintores del Sur Ltda.">
+          <input type="text" id="input-empresa" class="campo-input" placeholder="Ej: Extintores del Sur Ltda.">
         </div>
 
-        <div class="form-field">
+        <div class="campo">
           <label for="input-nro-cert">N° de certificado <span class="opcional">(opcional)</span></label>
-          <input type="text" id="input-nro-cert" placeholder="Ej: 2026-0143">
+          <input type="text" id="input-nro-cert" class="campo-input" placeholder="Ej: 2026-0143">
         </div>
 
-        <div class="form-field">
+        <div class="campo">
           <label for="input-archivo">Archivo PDF</label>
           <input type="file" id="input-archivo" accept="application/pdf" required>
-          <span id="archivo-nombre" class="archivo-nombre"></span>
+          <span id="archivo-nombre" style="font-size:0.8rem; color:var(--color-ink-soft);"></span>
         </div>
 
         <p id="form-error" class="form-error" hidden></p>
 
-        <div class="modal-actions">
-          <button type="button" id="btn-cancelar" class="btn btn-secondary">Cancelar</button>
-          <button type="submit" id="btn-guardar" class="btn btn-primary">Guardar certificado</button>
+        <div>
+          <button type="submit" class="btn btn-primary">Guardar certificado</button>
         </div>
       </form>
-    </div>
-  </div>
+    </section>
 
-  <!-- ===================== TOASTS / ALERTAS ===================== -->
+  </main>
+
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <!-- ===================== OVERLAY DE CARGA ===================== -->
   <div id="loading-overlay" class="loading-overlay" hidden>
     <div class="spinner" aria-hidden="true"></div>
     <p id="loading-texto">Procesando…</p>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+<script>
+  // ============================================================
+  // CONFIGURACIÓN — pega aquí la URL /exec de tu Apps Script
+  // ============================================================
+  const API_URL = 'PEGA_AQUI_LA_URL_DE_TU_WEB_APP/exec';
+
+  // ============================================================
+  // ESTADO
+  // ============================================================
+  let centroConsultaActual = null;
+
+  const ESTADO_META = {
+    VIGENTE:          { texto: '🟢 Vigente',           badge: 'badge-vigente' },
+    PROXIMO_A_VENCER: { texto: '🟡 Próximo a vencer',  badge: 'badge-proximo' },
+    VENCIDO:          { texto: '🔴 Vencido',           badge: 'badge-vencido' },
+    SIN_CERTIFICADO:  { texto: '⚪ Sin certificado',   badge: 'badge-sin' }
+  };
+
+  // ============================================================
+  // API
+  // ============================================================
+  async function apiGet(action, params) {
+    const url = new URL(API_URL);
+    url.searchParams.set('action', action);
+    Object.entries(params || {}).forEach(([k, v]) => url.searchParams.set(k, v));
+    const resp = await fetch(url.toString());
+    const json = await resp.json();
+    if (!json.ok) throw new Error(json.error || 'Error desconocido en la API.');
+    return json.data;
+  }
+
+  async function apiPost(action, payload) {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, payload })
+    });
+    const json = await resp.json();
+    if (!json.ok) throw new Error(json.error || 'Error desconocido en la API.');
+    return json.data;
+  }
+
+  // ============================================================
+  // NAVEGACIÓN ENTRE VISTAS
+  // ============================================================
+  function mostrarVista(id) {
+    ['view-home', 'view-consultar', 'view-cargar'].forEach(v => {
+      document.getElementById(v).hidden = (v !== id);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarListaCentros();
+    configurarEventos();
+  });
+
+  function configurarEventos() {
+    document.getElementById('btn-ir-consultar').addEventListener('click', () => {
+      mostrarVista('view-consultar');
+      cargarDashboard();
+    });
+    document.getElementById('btn-ir-cargar').addEventListener('click', () => {
+      mostrarVista('view-cargar');
+    });
+    document.querySelectorAll('[data-volver]').forEach(btn => {
+      btn.addEventListener('click', () => mostrarVista('view-home'));
+    });
+
+    document.getElementById('selector-centro').addEventListener('change', (e) => {
+      if (e.target.value) seleccionarCentroConsulta(e.target.value);
+    });
+
+    document.getElementById('btn-descargar-centro').addEventListener('click', () => {
+      const url = document.getElementById('btn-descargar-centro').dataset.url;
+      if (!url) return mostrarToast('Este centro no posee un certificado vigente.', 'error');
+      window.open(url, '_blank');
+    });
+
+    document.getElementById('input-tipo').addEventListener('change', (e) => {
+      document.getElementById('campo-nombre-activo').hidden = (e.target.value === 'CENTRO');
+    });
+
+    document.getElementById('input-archivo').addEventListener('change', (e) => {
+      const archivo = e.target.files[0];
+      document.getElementById('archivo-nombre').textContent = archivo ? archivo.name : '';
+    });
+
+    document.getElementById('form-cargar').addEventListener('submit', onSubmitCargar);
+  }
+
+  // ============================================================
+  // CARGA DE LISTA DE CENTROS (para ambos selects: consultar y cargar)
+  // ============================================================
+  async function cargarListaCentros() {
+    try {
+      const centros = await apiGet('centros');
+      const selectConsultar = document.getElementById('selector-centro');
+      const selectCargar = document.getElementById('input-centro');
+      centros.forEach(c => {
+        const opt1 = document.createElement('option');
+        opt1.value = c.nombre; opt1.textContent = c.nombre;
+        selectConsultar.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = c.nombre; opt2.textContent = c.nombre;
+        selectCargar.appendChild(opt2);
+      });
+    } catch (err) {
+      mostrarToast('No se pudo cargar la lista de centros. Recargue la página.', 'error');
+    }
+  }
+
+  // ============================================================
+  // VISTA CONSULTAR
+  // ============================================================
+  async function cargarDashboard() {
+    try {
+      const stats = await apiGet('dashboard');
+      pintarGrupoDashboard('centro', stats.centros);
+      pintarGrupoDashboard('bote', stats.botes);
+      pintarGrupoDashboard('artefacto', stats.artefactosNavales);
+    } catch (err) { /* el dashboard es informativo, no bloquea el resto */ }
+  }
+
+  function pintarGrupoDashboard(prefijo, stats) {
+    document.getElementById(`stat-${prefijo}-total`).textContent = stats.total;
+    document.getElementById(`stat-${prefijo}-vigentes`).textContent = stats.vigentes;
+    document.getElementById(`stat-${prefijo}-proximos`).textContent = stats.proximosAVencer;
+    document.getElementById(`stat-${prefijo}-vencidos`).textContent = stats.vencidos;
+  }
+
+  async function seleccionarCentroConsulta(centro) {
+    centroConsultaActual = centro;
+    mostrarCargando('Consultando centro…');
+    try {
+      const info = await apiGet('infoCentroCompleto', { centro });
+      renderResultadoConsulta(info);
+      document.getElementById('resultado-consulta').hidden = false;
+    } catch (err) {
+      mostrarToast('Error al consultar el centro: ' + err.message, 'error');
+    } finally {
+      ocultarCargando();
+    }
+  }
+
+  function renderResultadoConsulta(info) {
+    document.getElementById('centro-nombre').textContent = info.centro;
+
+    const meta = ESTADO_META[info.estadoCentro] || ESTADO_META.SIN_CERTIFICADO;
+    const badge = document.getElementById('centro-badge');
+    badge.textContent = meta.texto;
+    badge.className = 'badge ' + meta.badge;
+
+    const cert = info.certificadoCentro;
+    const btnDescargar = document.getElementById('btn-descargar-centro');
+    if (cert && info.estadoCentro !== 'SIN_CERTIFICADO') {
+      document.getElementById('centro-fecha-cert').textContent = cert.fechaCertificacion || '—';
+      document.getElementById('centro-fecha-venc').textContent = cert.fechaVencimiento || '—';
+      document.getElementById('centro-dias').textContent = formatearDias(cert.diasRestantes);
+      document.getElementById('centro-empresa').textContent = cert.empresaCertificadora || '—';
+      btnDescargar.disabled = false;
+      btnDescargar.dataset.url = cert.urlArchivo || '';
+    } else {
+      document.getElementById('centro-fecha-cert').textContent = '—';
+      document.getElementById('centro-fecha-venc').textContent = '—';
+      document.getElementById('centro-dias').textContent = '—';
+      document.getElementById('centro-empresa').textContent = '—';
+      btnDescargar.disabled = true;
+      btnDescargar.dataset.url = '';
+    }
+
+    renderListaActivos('lista-botes', info.botes, 'botes');
+    renderListaActivos('lista-artefactos', info.artefactosNavales, 'artefactos navales');
+  }
+
+  function renderListaActivos(contenedorId, items, etiquetaVacio) {
+    const cont = document.getElementById(contenedorId);
+    cont.innerHTML = '';
+    if (!items || items.length === 0) {
+      cont.innerHTML = `<p class="lista-vacia">Este centro no tiene ${etiquetaVacio} con certificado registrado.</p>`;
+      return;
+    }
+    items.forEach(item => {
+      const meta = ESTADO_META[item.estado] || ESTADO_META.SIN_CERTIFICADO;
+      const cert = item.certificado;
+      const row = document.createElement('div');
+      row.className = 'activo-item';
+      row.innerHTML = `
+        <div>
+          <span class="activo-item-nombre">${escapeHtml(item.nombre)}</span>
+          <span class="badge ${meta.badge}">${meta.texto}</span>
+          ${cert ? `<span class="activo-item-detalle">Vence: ${escapeHtml(cert.fechaVencimiento || '—')}</span>` : ''}
+        </div>
+        <button type="button" class="btn btn-primary btn-descargar-item" ${cert && cert.urlArchivo ? '' : 'disabled'}>Descargar</button>
+      `;
+      if (cert && cert.urlArchivo) {
+        row.querySelector('.btn-descargar-item').addEventListener('click', () => window.open(cert.urlArchivo, '_blank'));
+      }
+      cont.appendChild(row);
+    });
+  }
+
+  function formatearDias(dias) {
+    if (dias === null || dias === undefined) return '—';
+    if (dias < 0) return Math.abs(dias) + ' días vencido';
+    if (dias === 0) return 'Vence hoy';
+    return dias + ' días';
+  }
+
+  // ============================================================
+  // VISTA CARGAR
+  // ============================================================
+  async function onSubmitCargar(e) {
+    e.preventDefault();
+
+    const errorEl = document.getElementById('form-error');
+    errorEl.hidden = true;
+    document.getElementById('carga-exito').hidden = true;
+
+    const centro = document.getElementById('input-centro').value;
+    const tipoActivo = document.getElementById('input-tipo').value;
+    const nombreActivo = document.getElementById('input-nombre-activo').value.trim();
+    const fechaCert = document.getElementById('input-fecha-cert').value;
+    const fechaVenc = document.getElementById('input-fecha-venc').value;
+    const empresa = document.getElementById('input-empresa').value.trim();
+    const nroCert = document.getElementById('input-nro-cert').value.trim();
+    const archivo = document.getElementById('input-archivo').files[0];
+
+    if (!centro) return mostrarErrorForm('Debe seleccionar el centro de trabajo.');
+    if (tipoActivo !== 'CENTRO' && !nombreActivo) return mostrarErrorForm('Debe indicar el nombre del bote o artefacto naval.');
+    if (!archivo) return mostrarErrorForm('Debe seleccionar un archivo.');
+    if (archivo.type !== 'application/pdf') return mostrarErrorForm('El archivo debe ser un PDF.');
+    if (!fechaCert) return mostrarErrorForm('Debe indicar la fecha de certificación.');
+    if (!fechaVenc) return mostrarErrorForm('Debe indicar la fecha de vencimiento.');
+    if (new Date(fechaVenc) <= new Date(fechaCert)) {
+      return mostrarErrorForm('La fecha de vencimiento debe ser posterior a la fecha de certificación.');
+    }
+
+    try {
+      const base64 = await leerArchivoComoBase64(archivo);
+      mostrarCargando('Subiendo certificado…');
+
+      await apiPost('subirCertificado', {
+        centro, tipoActivo, nombreActivo,
+        fechaCertificacion: fechaCert,
+        fechaVencimiento: fechaVenc,
+        empresaCertificadora: empresa,
+        nroCertificado: nroCert,
+        archivoBase64: base64,
+        nombreArchivo: archivo.name,
+        mimeType: archivo.type
+      });
+
+      document.getElementById('form-cargar').reset();
+      document.getElementById('campo-nombre-activo').hidden = true;
+      document.getElementById('archivo-nombre').textContent = '';
+      const exito = document.getElementById('carga-exito');
+      exito.textContent = 'Certificado cargado correctamente. El anterior de este activo (si existía) fue reemplazado.';
+      exito.hidden = false;
+      mostrarToast('Certificado guardado.', 'success');
+    } catch (err) {
+      mostrarErrorForm(err.message || 'Ocurrió un error al guardar el certificado.');
+    } finally {
+      ocultarCargando();
+    }
+  }
+
+  function leerArchivoComoBase64(archivo) {
+    return new Promise((resolve, reject) => {
+      const lector = new FileReader();
+      lector.onload = () => resolve(lector.result.split(',')[1]);
+      lector.onerror = () => reject(new Error('No se pudo leer el archivo seleccionado.'));
+      lector.readAsDataURL(archivo);
+    });
+  }
+
+  function mostrarErrorForm(mensaje) {
+    const el = document.getElementById('form-error');
+    el.textContent = mensaje;
+    el.hidden = false;
+  }
+
+  // ============================================================
+  // UTILIDADES DE UI
+  // ============================================================
+  function mostrarCargando(texto) {
+    document.getElementById('loading-texto').textContent = texto || 'Procesando…';
+    document.getElementById('loading-overlay').hidden = false;
+  }
+  function ocultarCargando() {
+    document.getElementById('loading-overlay').hidden = true;
+  }
+  function mostrarToast(mensaje, tipo) {
+    const cont = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast' + (tipo === 'success' ? ' toast-success' : tipo === 'error' ? ' toast-error' : '');
+    toast.textContent = mensaje;
+    cont.appendChild(toast);
+    setTimeout(() => toast.remove(), 4500);
+  }
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
 </body>
 </html>
