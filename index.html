@@ -116,6 +116,24 @@
 
   [hidden] { display: none !important; }
 
+  /* ---------- Resumen general (tabla) ---------- */
+  .resumen-grupo { margin-bottom: 26px; }
+  .resumen-grupo-titulo { font-size: 0.95rem; font-weight: 700; margin: 0 0 10px; }
+  .tabla-resumen {
+    width: 100%; border-collapse: collapse; background: var(--color-surface);
+    border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .tabla-resumen tr { border-top: 1px solid var(--color-border); }
+  .tabla-resumen tr:first-child { border-top: none; }
+  .tabla-resumen td { padding: 10px 14px; font-size: 0.88rem; vertical-align: middle; }
+  .tabla-resumen td.col-nombre { font-weight: 700; width: 32%; }
+  .tabla-resumen td.col-venc { color: var(--color-ink-soft); white-space: nowrap; }
+  .tabla-resumen td.col-dias { color: var(--color-ink-soft); white-space: nowrap; }
+  .tabla-resumen td.col-descargar { text-align: right; white-space: nowrap; }
+  .link-descargar { color: var(--color-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+  .link-descargar:hover { text-decoration: underline; }
+
   @media (max-width: 700px) {
     .opciones-grid, .opciones-grid.tres { grid-template-columns: 1fr; }
     .info-grid { grid-template-columns: repeat(2, 1fr); }
@@ -138,7 +156,7 @@
 
     <!-- ===================== VISTA: INICIO ===================== -->
     <section id="view-home">
-      <div class="opciones-grid">
+      <div class="opciones-grid tres">
         <button type="button" class="opcion-grande" id="btn-ir-consultar">
           <span class="icono">🔍</span>
           CONSULTAR CERTIFICADOS
@@ -147,6 +165,36 @@
           <span class="icono">⬆️</span>
           CARGAR NUEVO CERTIFICADO
         </button>
+        <button type="button" class="opcion-grande" id="btn-ir-resumen">
+          <span class="icono">📊</span>
+          RESUMEN GENERAL
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== VISTA: RESUMEN GENERAL ===================== -->
+    <section id="view-resumen" hidden>
+      <button type="button" class="btn-volver" data-volver-home>← Volver al inicio</button>
+      <h2 style="margin-bottom:6px;">Resumen general</h2>
+      <p style="color:var(--color-ink-soft); font-size:0.88rem; margin:0 0 18px;">
+        Estado de todos los centros, artefactos navales y botes registrados.
+      </p>
+
+      <div id="resumen-cargando" style="color:var(--color-ink-soft); font-size:0.9rem;">Cargando resumen…</div>
+
+      <div id="resumen-contenido" hidden>
+        <div class="resumen-grupo">
+          <h3 class="resumen-grupo-titulo">Centros de Trabajo</h3>
+          <table class="tabla-resumen"><tbody id="tabla-resumen-centro"></tbody></table>
+        </div>
+        <div class="resumen-grupo">
+          <h3 class="resumen-grupo-titulo">Artefactos Navales</h3>
+          <table class="tabla-resumen"><tbody id="tabla-resumen-artefacto"></tbody></table>
+        </div>
+        <div class="resumen-grupo">
+          <h3 class="resumen-grupo-titulo">Botes</h3>
+          <table class="tabla-resumen"><tbody id="tabla-resumen-bote"></tbody></table>
+        </div>
       </div>
     </section>
 
@@ -330,7 +378,7 @@
   // NAVEGACIÓN
   // ============================================================
   function mostrarVista(id) {
-    ['view-home', 'view-consultar-tipo', 'view-consultar-resultado', 'view-cargar'].forEach(v => {
+    ['view-home', 'view-consultar-tipo', 'view-consultar-resultado', 'view-cargar', 'view-resumen'].forEach(v => {
       document.getElementById(v).hidden = (v !== id);
     });
   }
@@ -349,6 +397,10 @@
       if (!clave) return;
       claveCargaIngresada = clave;
       mostrarVista('view-cargar');
+    });
+    document.getElementById('btn-ir-resumen').addEventListener('click', () => {
+      mostrarVista('view-resumen');
+      cargarResumenGeneral();
     });
     document.querySelectorAll('[data-volver-home]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -469,6 +521,81 @@
     if (dias < 0) return Math.abs(dias) + ' días vencido';
     if (dias === 0) return 'Vence hoy';
     return dias + ' días';
+  }
+
+  // ============================================================
+  // VISTA: RESUMEN GENERAL
+  // ============================================================
+  // Orden de urgencia para ordenar cada tabla: lo más urgente primero.
+  const ORDEN_URGENCIA = { VENCIDO: 0, PROXIMO_A_VENCER: 1, SIN_CERTIFICADO: 2, VIGENTE: 3 };
+
+  async function cargarResumenGeneral() {
+    document.getElementById('resumen-contenido').hidden = true;
+    document.getElementById('resumen-cargando').hidden = false;
+
+    try {
+      if (CENTROS.length === 0) await cargarCentros();
+
+      const [centros, artefactos, botes] = await Promise.all([
+        cargarFilasResumen('CENTRO', CENTROS),
+        cargarFilasResumen('ARTEFACTO_NAVAL', ARTEFACTOS_NAVALES),
+        cargarFilasResumen('BOTE', BOTES)
+      ]);
+
+      renderTablaResumen('tabla-resumen-centro', centros);
+      renderTablaResumen('tabla-resumen-artefacto', artefactos);
+      renderTablaResumen('tabla-resumen-bote', botes);
+
+      document.getElementById('resumen-cargando').hidden = true;
+      document.getElementById('resumen-contenido').hidden = false;
+    } catch (err) {
+      document.getElementById('resumen-cargando').textContent = 'No se pudo cargar el resumen: ' + err.message;
+    }
+  }
+
+  /** Consulta en paralelo todos los nombres de un tipo y devuelve las filas ya ordenadas por urgencia. */
+  async function cargarFilasResumen(tipo, nombres) {
+    const resultados = await Promise.all(
+      nombres.map(nombre =>
+        apiGet('infoActivo', { tipo, nombre })
+          .then(info => ({ nombre, info }))
+          .catch(() => ({ nombre, info: { estado: 'SIN_CERTIFICADO', certificado: null } }))
+      )
+    );
+    return resultados.sort((a, b) => ORDEN_URGENCIA[a.info.estado] - ORDEN_URGENCIA[b.info.estado]);
+  }
+
+  function renderTablaResumen(tbodyId, filas) {
+    const tbody = document.getElementById(tbodyId);
+    tbody.innerHTML = '';
+
+    filas.forEach(({ nombre, info }) => {
+      const meta = ESTADO_META[info.estado] || ESTADO_META.SIN_CERTIFICADO;
+      const cert = info.certificado;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="col-nombre">${escapeHtml(nombre)}</td>
+        <td><span class="badge ${meta.badge}">${meta.texto}</span></td>
+        <td class="col-venc">${cert ? escapeHtml(cert.fechaVencimiento || '—') : '—'}</td>
+        <td class="col-dias">${cert ? formatearDias(cert.diasRestantes) : '—'}</td>
+        <td class="col-descargar">${cert && cert.urlArchivo ? '<a class="link-descargar" href="#" data-url="' + escapeHtml(cert.urlArchivo) + '">Descargar</a>' : ''}</td>
+      `;
+      const link = tr.querySelector('.link-descargar');
+      if (link) {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.open(link.dataset.url, '_blank');
+        });
+      }
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   // ============================================================
