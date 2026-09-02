@@ -322,8 +322,8 @@
   // LISTAS FIJAS
   // ============================================================
   const ARTEFACTOS_NAVALES = [
-    'Australis 1', 'Australis 3', 'Australis 5', 'Australis 7', 'Australis 8',
-    'Invermar I', 'Invermar II', 'Invermar III', 'Invermar IV', 'Invermar V', 'Invermar VI', 'Invermar VII', 'Invermar VIII', 'Invermar IX', 'Invermar X', 'Pelagos II'
+    'Australis III', 'Australis V', 'Australis VII', 'Australis VIII',
+    'Invermar V', 'Invermar VII', 'Pelagos II'
   ];
 
   const BOTES = [
@@ -455,7 +455,7 @@
     return [];
   }
 
-  function abrirConsultaPorTipo(tipo) {
+  async function abrirConsultaPorTipo(tipo) {
     tipoConsultaActual = tipo;
     document.getElementById('resultado-consulta').hidden = true;
 
@@ -465,14 +465,17 @@
       : 'Seleccione bote';
 
     const select = document.getElementById('selector-nombre-consulta');
+    select.innerHTML = '<option value="" selected disabled>Cargando…</option>';
+    mostrarVista('view-consultar-resultado');
+
+    if (tipo === 'CENTRO' && CENTROS.length === 0) await cargarCentros();
+
     select.innerHTML = '<option value="" selected disabled>Seleccionar…</option>';
     listaParaTipo(tipo).forEach(nombre => {
       const opt = document.createElement('option');
       opt.value = nombre; opt.textContent = nombre;
       select.appendChild(opt);
     });
-
-    mostrarVista('view-consultar-resultado');
   }
 
   async function consultarActivo(tipo, nombre) {
@@ -601,7 +604,7 @@
   // ============================================================
   // VISTA: CARGAR
   // ============================================================
-  function onCambiarTipoCarga(tipo) {
+  async function onCambiarTipoCarga(tipo) {
     const select = document.getElementById('input-nombre-activo');
     select.innerHTML = '';
     select.disabled = !tipo;
@@ -610,6 +613,9 @@
       select.innerHTML = '<option value="" selected disabled>Primero elige el tipo…</option>';
       return;
     }
+
+    select.innerHTML = '<option value="" selected disabled>Cargando…</option>';
+    if (tipo === 'CENTRO' && CENTROS.length === 0) await cargarCentros();
 
     select.innerHTML = '<option value="" selected disabled>Seleccionar…</option>';
     listaParaTipo(tipo).forEach(nombre => {
