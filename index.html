@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reservorio de Certificados de Extintores — Invermar</title>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <style>
   :root {
     --color-primary: #00205B;
@@ -144,7 +146,7 @@
 
   <header class="app-header">
     <div class="header-inner">
-      <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo">
+      <img src="img/logo-invermar.png" alt="Invermar" class="brand-logo" width="162" height="40" decoding="async">
       <div class="brand-text">
         <h1>Reservorio de Certificados de Extintores</h1>
         <p>Plataforma para consulta y gestión de certificados de extintores de Centros de Trabajo, Botes y Artefactos Navales.</p>
@@ -338,6 +340,11 @@
 
   let CENTROS = []; // se llena desde la API al cargar la página
 
+  // Resumen completo traído en UNA sola llamada: { centros, infos: { "TIPO|Nombre": info } }
+  let RESUMEN = null;
+  let RESUMEN_PROMESA = null;
+  const INFO_SIN_CERT = { estado: 'SIN_CERTIFICADO', certificado: null };
+
   const TIPO_LABEL = { CENTRO: 'Centro', ARTEFACTO_NAVAL: 'Artefacto Naval', BOTE: 'Bote' };
 
   const ESTADO_META = {
@@ -436,10 +443,30 @@
     document.getElementById('form-cargar').addEventListener('submit', onSubmitCargar);
   }
 
+  /**
+   * Trae centros + estado de todos los activos en una sola petición.
+   * Si ya hay una petición en curso, reutiliza la misma (no duplica llamadas).
+   */
+  function cargarResumenDatos(forzar) {
+    if (RESUMEN && !forzar) return Promise.resolve(RESUMEN);
+    if (RESUMEN_PROMESA && !forzar) return RESUMEN_PROMESA;
+    RESUMEN_PROMESA = apiGet('resumen')
+      .then(data => {
+        RESUMEN = data;
+        CENTROS = data.centros.map(c => c.nombre);
+        return data;
+      })
+      .finally(() => { RESUMEN_PROMESA = null; });
+    return RESUMEN_PROMESA;
+  }
+
+  function infoDe(tipo, nombre) {
+    return (RESUMEN && RESUMEN.infos[tipo + '|' + nombre]) || INFO_SIN_CERT;
+  }
+
   async function cargarCentros() {
     try {
-      const centros = await apiGet('centros');
-      CENTROS = centros.map(c => c.nombre);
+      await cargarResumenDatos();
     } catch (err) {
       mostrarToast('No se pudo cargar la lista de centros. Recargue la página.', 'error');
     }
@@ -481,8 +508,8 @@
   async function consultarActivo(tipo, nombre) {
     mostrarCargando('Consultando…');
     try {
-      const info = await apiGet('infoActivo', { tipo, nombre });
-      renderResultado(tipo, nombre, info);
+      await cargarResumenDatos();
+      renderResultado(tipo, nombre, infoDe(tipo, nombre));
       document.getElementById('resultado-consulta').hidden = false;
     } catch (err) {
       mostrarToast('Error al consultar: ' + err.message, 'error');
@@ -537,13 +564,11 @@
     document.getElementById('resumen-cargando').hidden = false;
 
     try {
-      if (CENTROS.length === 0) await cargarCentros();
+      await cargarResumenDatos();
 
-      const [centros, artefactos, botes] = await Promise.all([
-        cargarFilasResumen('CENTRO', CENTROS),
-        cargarFilasResumen('ARTEFACTO_NAVAL', ARTEFACTOS_NAVALES),
-        cargarFilasResumen('BOTE', BOTES)
-      ]);
+      const centros = cargarFilasResumen('CENTRO', CENTROS);
+      const artefactos = cargarFilasResumen('ARTEFACTO_NAVAL', ARTEFACTOS_NAVALES);
+      const botes = cargarFilasResumen('BOTE', BOTES);
 
       renderTablaResumen('tabla-resumen-centro', centros);
       renderTablaResumen('tabla-resumen-artefacto', artefactos);
@@ -556,15 +581,9 @@
     }
   }
 
-  /** Consulta en paralelo todos los nombres de un tipo y devuelve las filas ya ordenadas por urgencia. */
-  async function cargarFilasResumen(tipo, nombres) {
-    const resultados = await Promise.all(
-      nombres.map(nombre =>
-        apiGet('infoActivo', { tipo, nombre })
-          .then(info => ({ nombre, info }))
-          .catch(() => ({ nombre, info: { estado: 'SIN_CERTIFICADO', certificado: null } }))
-      )
-    );
+  /** Arma las filas de un tipo con los datos ya descargados y las ordena por urgencia. */
+  function cargarFilasResumen(tipo, nombres) {
+    const resultados = nombres.map(nombre => ({ nombre, info: infoDe(tipo, nombre) }));
     return resultados.sort((a, b) => ORDEN_URGENCIA[a.info.estado] - ORDEN_URGENCIA[b.info.estado]);
   }
 
@@ -665,6 +684,10 @@
         mimeType: archivo.type,
         clave: claveCargaIngresada
       });
+
+      // Los datos cambiaron: se vuelven a pedir al servidor (la caché del servidor ya se limpió).
+      RESUMEN = null;
+      cargarResumenDatos(true).catch(() => {});
 
       document.getElementById('form-cargar').reset();
       document.getElementById('input-nombre-activo').innerHTML = '<option value="" selected disabled>Primero elige el tipo…</option>';
